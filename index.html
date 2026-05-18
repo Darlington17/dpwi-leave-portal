@@ -1,0 +1,606 @@
+<!-- AUTHENTICATION PAGE -->
+<div id="auth-page">
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo-box">
+                <div class="shield"><i class="fa-solid fa-landmark"></i></div>
+                <div class="logo-text">
+                    public works &<br>infrastructure
+                </div>
+            </div>
+            <p style="font-size: 0.8rem; color: #666; font-weight: bold;">FREE STATE PROVINCE</p>
+        </div>
+        <div class="auth-tabs">
+            <button class="tab-btn active" onclick="showAuthTab('login')">LOGIN</button>
+            <button class="tab-btn" onclick="showAuthTab('register')">REGISTER</button>
+        </div>
+        <div class="auth-body">
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="login-email" placeholder="name@fsworks.gov.za" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">LOGIN</button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="#" style="color: var(--gold-brown); font-size: 0.85rem; text-decoration: none;">Forgot Password?</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="hidden">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="reg-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address (@fsworks.gov.za)</label>
+                    <input type="email" id="reg-email" placeholder="name@fsworks.gov.za" required>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="reg-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="reg-confirm" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="reg-role">
+                        <option value="Employee">Employee</option>
+                        <option value="Manager">Manager</option>
+                        <option value="HR Admin">HR Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <input type="text" id="reg-dept" value="Public Works and Infrastructure" readonly>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center;">REGISTER</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN APPLICATION -->
+<div id="main-app" class="hidden">
+    <aside id="sidebar">
+        <div style="padding: 20px; text-align: center; border-bottom: 1px solid #444;">
+            <div class="shield" style="margin: 0 auto 10px; width: 30px; height: 40px;"><i class="fa-solid fa-landmark" style="font-size: 15px;"></i></div>
+            <div style="font-size: 0.7rem; font-weight: bold; color: var(--light-gold);">DPWI FREE STATE</div>
+        </div>
+        <nav style="flex: 1; margin-top: 20px;">
+            <a href="#" class="nav-item active" onclick="navigateTo('employee-dashboard')">
+                <i class="fa-solid fa-house"></i> <span>My Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navigateTo('leave-application-view')">
+                <i class="fa-solid fa-plus"></i> <span>Apply for Leave</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navigateTo('my-applications-list')">
+                <i class="fa-solid fa-list-ul"></i> <span>My Applications</span>
+            </a>
+            <div id="manager-nav" class="hidden">
+                <div style="padding: 15px 25px; font-size: 0.7rem; color: #777; text-transform: uppercase; font-weight: bold;">Management</div>
+                <a href="#" class="nav-item" onclick="navigateTo('manager-dashboard')">
+                    <i class="fa-solid fa-users-gear"></i> <span>Team Requests</span>
+                </a>
+            </div>
+        </nav>
+        <a href="#" class="nav-item" onclick="logout()" style="border-top: 1px solid #444;">
+            <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+        </a>
+    </aside>
+
+    <main id="content">
+        <header>
+            <div class="logo-box">
+                <div class="shield" style="width: 30px; height: 40px;"><i class="fa-solid fa-landmark" style="font-size: 15px;"></i></div>
+                <div class="logo-text" style="font-size: 0.9rem;">public works &<br>infrastructure</div>
+            </div>
+            <div class="user-profile">
+                <span id="welcome-msg" style="font-weight: 500;">Welcome, User</span>
+                <button class="btn btn-primary" onclick="logout()" style="padding: 5px 12px; font-size: 0.8rem;">Logout</button>
+            </div>
+        </header>
+
+        <div id="view-container" style="padding: 30px;">
+            
+            <!-- EMPLOYEE DASHBOARD HOME -->
+            <section id="employee-dashboard" class="view-section">
+                <h2 style="margin-bottom: 20px;">Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div><h3>Total Applications</h3><p id="stat-total">0</p></div>
+                        <i class="fa-solid fa-file-lines stat-icon"></i>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--pending);">
+                        <div><h3>Pending</h3><p id="stat-pending">0</p></div>
+                        <i class="fa-solid fa-clock stat-icon" style="color: var(--pending);"></i>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--approved);">
+                        <div><h3>Approved</h3><p id="stat-approved">0</p></div>
+                        <i class="fa-solid fa-circle-check stat-icon" style="color: var(--approved);"></i>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--rejected);">
+                        <div><h3>Rejected</h3><p id="stat-rejected">0</p></div>
+                        <i class="fa-solid fa-circle-xmark stat-icon" style="color: var(--rejected);"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MY APPLICATIONS LIST -->
+            <section id="my-applications-list" class="view-section hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>My Applications</h2>
+                    <button class="btn btn-primary" onclick="navigateTo('leave-application-view')">New Application</button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date Applied</th>
+                                    <th>Leave Type</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Days</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-apps-tbody">
+                                <!-- Rows added dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LEAVE APPLICATION FORM -->
+            <section id="leave-application-view" class="view-section hidden">
+                <div class="no-print" style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="submitLeaveForm()"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
+                    <button class="btn btn-gold" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+                </div>
+
+                <div class="leave-form-container">
+                    <div class="form-header-official">
+                        <h2 style="text-transform: uppercase;">Application for Leave of Absence</h2>
+                        <p style="font-weight: bold;">Department of Public Works and Infrastructure - Free State Province</p>
+                        <p style="font-size: 0.8rem;">With effect from 19 May 2021</p>
+                    </div>
+
+                    <div class="form-section-title">Personal Details</div>
+                    <div class="grid-2">
+                        <div class="form-group"><label>Surname *</label><input type="text" id="f-surname" required></div>
+                        <div class="form-group"><label>Initials *</label><input type="text" id="f-initials" required></div>
+                        <div class="form-group"><label>PERSAL Number *</label><input type="text" id="f-persal" required></div>
+                        <div class="form-group"><label>Email Address</label><input type="text" id="f-email" readonly></div>
+                        <div class="form-group"><label>Telephone</label><input type="text" id="f-tel"></div>
+                        <div class="form-group"><label>Department</label><input type="text" value="Public Works and Infrastructure" readonly></div>
+                    </div>
+                    <div class="form-group"><label>Component / Office</label><input type="text" id="f-office"></div>
+                    <div class="form-group"><label>Address During Leave Period</label><textarea id="f-address" rows="2"></textarea></div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Shift Worker?</label>
+                            <input type="radio" name="shift" value="Yes"> Yes &nbsp;
+                            <input type="radio" name="shift" value="No" checked> No
+                        </div>
+                        <div class="form-group">
+                            <label>Casual Employee?</label>
+                            <input type="radio" name="casual" value="Yes"> Yes &nbsp;
+                            <input type="radio" name="casual" value="No" checked> No
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">SECTION A: Full Day Leave (Select One)</div>
+                    <table class="leave-table">
+                        <thead><tr><th>Select</th><th>Leave Type</th><th>End Date</th><th>Working Days</th></tr></thead>
+                        <tbody>
+                            <tr><td><input type="radio" name="leaveType" value="Annual Leave"></td><td>Annual Leave</td><td rowspan="10"><input type="date" id="f-end-date"></td><td rowspan="10"><input type="number" id="f-days"></td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Normal Sick Leave"></td><td>Normal Sick Leave (Support evidence)</td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Temporary Incapacity Leave"></td><td>Temporary Incapacity Leave</td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Occupational Injuries"></td><td>Leave for Occupational Injuries/Diseases</td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Adoption Leave"></td><td>Adoption Leave</td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Family Responsibility Leave"></td><td>Family Responsibility Leave</td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Pre-natal Leave"></td><td>Pre-natal Leave</td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Paternity Leave"></td><td>Paternity Leave</td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Special Leave"></td><td>Special Leave: <input type="text" placeholder="Type..." style="width:100px; padding:2px;"></td></tr>
+                            <tr><td><input type="radio" name="leaveType" value="Union Leave"></td><td>Leave for Union Office Bearers</td></tr>
+                        </tbody>
+                    </table>
+
+                    <p style="font-weight: bold; margin-bottom: 5px;">Calendar Days / Months Section</p>
+                    <div class="grid-2">
+                        <div class="form-group"><label>Start Date</label><input type="date" id="f-start-date"></div>
+                        <div class="form-group"><label>Unpaid Leave Motivation</label><textarea id="f-motivation" rows="1"></textarea></div>
+                    </div>
+
+                    <div class="form-section-title">SECTION B: Partial Day Leave</div>
+                    <table class="leave-table">
+                        <thead><tr><th>Date</th><th>Start Time</th><th>End Time</th><th>Hours</th><th>Min</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="date" id="f-p-date"></td>
+                                <td><input type="time" id="f-p-start"></td>
+                                <td><input type="time" id="f-p-end"></td>
+                                <td><input type="number" id="f-p-h" style="width:50px;"></td>
+                                <td><input type="number" id="f-p-m" style="width:50px;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="certification-box">
+                        "I hereby certify that I have acquainted myself with my available leave credits and with the rules governing the leave I have applied for. Further, I am certifying that the information provided is correct. Any falsification of information in this regard may form ground for disciplinary action."
+                        <div class="grid-2" style="margin-top: 15px;">
+                            <div><label>Signature (Full Name):</label><br><input type="text" id="f-signature" style="border:none; border-bottom:1px solid #000; width:100%;"></div>
+                            <div><label>Date:</label><br><input type="text" id="f-curr-date" readonly style="border:none; border-bottom:1px solid #000; width:100%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">SUPERVISOR RECOMMENDATION SECTION (Official Use)</div>
+                    <div class="grid-2">
+                        <div>
+                            <input type="checkbox" disabled> Recommended <br>
+                            <input type="checkbox" disabled> Not Recommended <br>
+                            <input type="checkbox" disabled> Rescheduled
+                        </div>
+                        <div>
+                            <label>Supervisor Name:</label><br>
+                            <div style="height: 30px; border-bottom: 1px solid #000;"></div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Remarks:</label>
+                        <div style="height: 40px; border-bottom: 1px solid #000;"></div>
+                    </div>
+                    <div style="text-align: right; margin-top: 20px; font-weight: bold;">
+                        REPUBLIC OF SOUTH AFRICA
+                    </div>
+                </div>
+            </section>
+
+            <!-- MANAGER DASHBOARD -->
+            <section id="manager-dashboard" class="view-section hidden">
+                <h2 style="margin-bottom: 20px;">Manager Approval Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-left-color: var(--pending);">
+                        <div><h3>Pending Review</h3><p id="m-stat-pending">0</p></div>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--approved);">
+                        <div><h3>Total Approved</h3><p id="m-stat-approved">0</p></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Leave Type</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Days</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manager-apps-tbody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<!-- View Application Modal -->
+<div id="view-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div id="modal-body-content" style="padding: 20px;"></div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast"></div>
+
+<script>
+    // ===== EMAILJS CONFIG - UPDATE THESE =====
+    const EMAILJS_SERVICE_ID = 'service_default';
+    const EMAILJS_TEMPLATE_ID = 'template_leave_app';  
+    const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY_HERE';
+    // =========================================
+
+    // Initialize EmailJS
+    (function() {
+        if(EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+        }
+    })();
+
+    // Data Management
+    let currentUser = JSON.parse(localStorage.getItem('dpwi_user')) || null;
+    let applications = JSON.parse(localStorage.getItem('dpwi_apps')) || [];
+    let users = JSON.parse(localStorage.getItem('dpwi_users')) || [
+        { name: 'Darlington Test', email: 'darlington1717@gmail.com', password: 'password123', role: 'Manager', dept: 'Public Works' }
+    ];
+
+    // Auth Tabs Logic
+    function showAuthTab(tab) {
+        const loginForm = document.getElementById('login-form');
+        const regForm = document.getElementById('register-form');
+        const tabs = document.querySelectorAll('.tab-btn');
+        
+        if(tab === 'login') {
+            loginForm.classList.remove('hidden');
+            regForm.classList.add('hidden');
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+        } else {
+            loginForm.classList.add('hidden');
+            regForm.classList.remove('hidden');
+            tabs[1].classList.add('active');
+            tabs[0].classList.remove('active');
+        }
+    }
+
+    // Authentication Logic
+    document.getElementById('login-form').onsubmit = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-password').value;
+
+        const user = users.find(u => u.email === email && u.password === pass);
+        if(user) {
+            loginSuccess(user);
+        } else {
+            showToast('Invalid credentials', 'error');
+        }
+    };
+
+    document.getElementById('register-form').onsubmit = (e) => {
+        e.preventDefault();
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const pass = document.getElementById('reg-password').value;
+        const confirm = document.getElementById('reg-confirm').value;
+        const role = document.getElementById('reg-role').value;
+        const dept = document.getElementById('reg-dept').value;
+
+        if(!email.endsWith('@fsworks.gov.za') && email !== 'darlington1717@gmail.com') {
+            showToast('Only @fsworks.gov.za emails allowed', 'error');
+            return;
+        }
+        if(pass !== confirm) {
+            showToast('Passwords do not match', 'error');
+            return;
+        }
+        if(users.some(u => u.email === email)) {
+            showToast('Email already registered', 'error');
+            return;
+        }
+
+        const newUser = { name, email, password: pass, role, dept };
+        users.push(newUser);
+        localStorage.setItem('dpwi_users', JSON.stringify(users));
+        showToast('Registration successful! Please login.', 'success');
+        showAuthTab('login');
+    };
+
+    function loginSuccess(user) {
+        currentUser = user;
+        localStorage.setItem('dpwi_user', JSON.stringify(user));
+        document.getElementById('auth-page').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('welcome-msg').innerText = `Welcome, ${user.name}`;
+        
+        if(user.role === 'Manager' || user.role === 'HR Admin') {
+            document.getElementById('manager-nav').classList.remove('hidden');
+        } else {
+            document.getElementById('manager-nav').classList.add('hidden');
+        }
+
+        // Fill leave form defaults
+        document.getElementById('f-email').value = user.email;
+        document.getElementById('f-curr-date').value = new Date().toLocaleDateString();
+
+        renderDashboard();
+        navigateTo('employee-dashboard');
+    }
+
+    function logout() {
+        localStorage.removeItem('dpwi_user');
+        currentUser = null;
+        location.reload();
+    }
+
+    // Navigation
+    function navigateTo(viewId) {
+        document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+        
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        const activeItem = Array.from(document.querySelectorAll('.nav-item')).find(i => i.getAttribute('onclick').includes(viewId));
+        if(activeItem) activeItem.classList.add('active');
+
+        if(viewId === 'employee-dashboard') renderDashboard();
+        if(viewId === 'my-applications-list') renderMyApplications();
+        if(viewId === 'manager-dashboard') renderManagerDashboard();
+    }
+
+    // Leave Submission
+    function submitLeaveForm() {
+        const typeEl = document.querySelector('input[name="leaveType"]:checked');
+        const surname = document.getElementById('f-surname').value;
+        const startDate = document.getElementById('f-start-date').value;
+        const endDate = document.getElementById('f-end-date').value;
+        const days = document.getElementById('f-days').value;
+
+        if(!typeEl || !surname || !startDate || !endDate || !days) {
+            showToast('Please fill all required fields (*)', 'error');
+            return;
+        }
+
+        const newApp = {
+            id: Date.now(),
+            applicantName: currentUser.name,
+            applicantEmail: currentUser.email,
+            surname: surname,
+            initials: document.getElementById('f-initials').value,
+            persal: document.getElementById('f-persal').value,
+            leaveType: typeEl.value,
+            startDate: startDate,
+            endDate: endDate,
+            days: days,
+            status: 'Pending',
+            appliedOn: new Date().toLocaleDateString(),
+            details: {
+                tel: document.getElementById('f-tel').value,
+                office: document.getElementById('f-office').value,
+                address: document.getElementById('f-address').value
+            }
+        };
+
+        applications.push(newApp);
+        localStorage.setItem('dpwi_apps', JSON.stringify(applications));
+
+        // EmailJS Trigger
+        const templateParams = {
+            to_email: 'darlington1717@gmail.com',
+            employee_name: currentUser.name,
+            leave_type: newApp.leaveType,
+            start_date: newApp.startDate,
+            end_date: newApp.endDate,
+            days: newApp.days,
+            confirmation_email: currentUser.email
+        };
+
+        if(EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(() => console.log('Email sent'))
+                .catch(err => console.error('Email failed', err));
+        }
+
+        showToast('Application submitted successfully!', 'success');
+        navigateTo('my-applications-list');
+    }
+
+    // Rendering Dashboards
+    function renderDashboard() {
+        const myApps = applications.filter(a => a.applicantEmail === currentUser.email);
+        document.getElementById('stat-total').innerText = myApps.length;
+        document.getElementById('stat-pending').innerText = myApps.filter(a => a.status === 'Pending').length;
+        document.getElementById('stat-approved').innerText = myApps.filter(a => a.status === 'Approved').length;
+        document.getElementById('stat-rejected').innerText = myApps.filter(a => a.status === 'Rejected').length;
+    }
+
+    function renderMyApplications() {
+        const tbody = document.getElementById('my-apps-tbody');
+        const myApps = applications.filter(a => a.applicantEmail === currentUser.email).sort((a,b) => b.id - a.id);
+        
+        tbody.innerHTML = myApps.map(app => `
+            <tr>
+                <td>${app.appliedOn}</td>
+                <td>${app.leaveType}</td>
+                <td>${app.startDate}</td>
+                <td>${app.endDate}</td>
+                <td>${app.days}</td>
+                <td><span class="badge badge-${app.status.toLowerCase()}">${app.status}</span></td>
+                <td>
+                    <button class="btn btn-primary" style="padding:5px 10px; font-size:0.7rem;" onclick="viewApp(${app.id})">VIEW</button>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="7" style="text-align:center;">No applications found</td></tr>';
+    }
+
+    function renderManagerDashboard() {
+        const tbody = document.getElementById('manager-apps-tbody');
+        const pending = applications.filter(a => a.status === 'Pending');
+        const approved = applications.filter(a => a.status === 'Approved');
+
+        document.getElementById('m-stat-pending').innerText = pending.length;
+        document.getElementById('m-stat-approved').innerText = approved.length;
+
+        tbody.innerHTML = pending.map(app => `
+            <tr>
+                <td>${app.applicantName}</td>
+                <td>${app.leaveType}</td>
+                <td>${app.startDate}</td>
+                <td>${app.endDate}</td>
+                <td>${app.days}</td>
+                <td>
+                    <button class="btn btn-primary" style="padding:5px 10px; font-size:0.7rem;" onclick="handleApp(${app.id}, 'Approved')">APPROVE</button>
+                    <button class="btn btn-danger" style="padding:5px 10px; font-size:0.7rem;" onclick="handleApp(${app.id}, 'Rejected')">REJECT</button>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="6" style="text-align:center;">No pending requests</td></tr>';
+    }
+
+    function handleApp(id, status) {
+        const app = applications.find(a => a.id === id);
+        if(status === 'Rejected') {
+            const reason = prompt("Enter rejection reason:");
+            if(!reason) return;
+            app.rejectionReason = reason;
+        }
+        app.status = status;
+        localStorage.setItem('dpwi_apps', JSON.stringify(applications));
+        showToast(`Application ${status}`, 'success');
+        renderManagerDashboard();
+    }
+
+    function viewApp(id) {
+        const app = applications.find(a => a.id === id);
+        const modal = document.getElementById('view-modal');
+        const content = document.getElementById('modal-body-content');
+        
+        content.innerHTML = `
+            <h3>Application Details</h3>
+            <hr style="margin: 15px 0;">
+            <div class="grid-2">
+                <div><strong>Applicant:</strong> ${app.applicantName}</div>
+                <div><strong>Status:</strong> ${app.status}</div>
+                <div><strong>Type:</strong> ${app.leaveType}</div>
+                <div><strong>Duration:</strong> ${app.startDate} to ${app.endDate} (${app.days} days)</div>
+                <div><strong>PERSAL:</strong> ${app.persal}</div>
+                <div><strong>Applied On:</strong> ${app.appliedOn}</div>
+            </div>
+            ${app.rejectionReason ? `<div style="margin-top:15px; color:red;"><strong>Rejection Reason:</strong> ${app.rejectionReason}</div>` : ''}
+        `;
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('view-modal').classList.add('hidden');
+    }
+
+    function showToast(msg, type) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.className = `toast-${type} show`;
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Initialize session
+    window.onload = () => {
+        if(currentUser) loginSuccess(currentUser);
+    };
+
+    // TO SHARE THIS APP:
+    // 1. Upload this file to netlify.com (drag and drop - free)
+    // 2. You get a link like: https://yourapp.netlify.app
+    // 3. Share that link with anyone - they can register and use the full app
+    // 4. To update: just drag the new HTML file to Netlify again
+</script>

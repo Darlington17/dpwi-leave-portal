@@ -1,50 +1,50 @@
-<!-- AUTHENTICATION PAGE -->
+<!-- 1. LOGIN / REGISTER PAGE -->
 <div id="auth-page">
     <div class="auth-container">
         <div class="auth-header">
-            <div class="logo-box">
-                <div class="shield"><i class="fa-solid fa-landmark"></i></div>
-                <div class="logo-text">
-                    public works &<br>infrastructure
+            <div class="logo-wrapper">
+                <div class="shield-icon"><i class="fa-solid fa-landmark"></i></div>
+                <div class="logo-text-box">
+                    <div class="logo-text-main">public works &<br>infrastructure</div>
+                    <div class="logo-text-sub">FREE STATE PROVINCE</div>
                 </div>
             </div>
-            <p style="font-size: 0.8rem; color: #666; font-weight: bold;">FREE STATE PROVINCE</p>
         </div>
         <div class="auth-tabs">
-            <button class="tab-btn active" onclick="showAuthTab('login')">LOGIN</button>
-            <button class="tab-btn" onclick="showAuthTab('register')">REGISTER</button>
+            <button id="tab-login" class="tab-btn active" onclick="switchAuth('login')">LOGIN</button>
+            <button id="tab-register" class="tab-btn" onclick="switchAuth('register')">REGISTER</button>
         </div>
         <div class="auth-body">
             <!-- Login Form -->
             <form id="login-form">
                 <div class="form-group">
-                    <label>Email Address</label>
+                    <label>Official Email Address</label>
                     <input type="email" id="login-email" placeholder="name@fsworks.gov.za" required>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
                     <input type="password" id="login-password" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">LOGIN</button>
-                <div style="text-align: center; margin-top: 15px;">
-                    <a href="#" style="color: var(--gold-brown); font-size: 0.85rem; text-decoration: none;">Forgot Password?</a>
-                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Sign In</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 0.8rem;">
+                    <a href="#" class="text-gold" style="text-decoration: none;">Forgot password?</a>
+                </p>
             </form>
 
             <!-- Register Form -->
             <form id="register-form" class="hidden">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="reg-name" required>
+                    <input type="text" id="reg-name" placeholder="John Doe" required>
                 </div>
                 <div class="form-group">
-                    <label>Email Address (@fsworks.gov.za)</label>
-                    <input type="email" id="reg-email" placeholder="name@fsworks.gov.za" required>
+                    <label>Official Email (@fsworks.gov.za)</label>
+                    <input type="email" id="reg-email" placeholder="john.doe@fsworks.gov.za" required>
                 </div>
-                <div class="grid-2">
+                <div class="form-row">
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" id="reg-password" required>
+                        <input type="password" id="reg-pass" required>
                     </div>
                     <div class="form-group">
                         <label>Confirm Password</label>
@@ -63,133 +63,162 @@
                     <label>Department</label>
                     <input type="text" id="reg-dept" value="Public Works and Infrastructure" readonly>
                 </div>
-                <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center;">REGISTER</button>
+                <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center;">Create Account</button>
             </form>
         </div>
     </div>
 </div>
 
-<!-- MAIN APPLICATION -->
+<!-- 2. MAIN APPLICATION -->
 <div id="main-app" class="hidden">
+    <!-- Sidebar -->
     <aside id="sidebar">
-        <div style="padding: 20px; text-align: center; border-bottom: 1px solid #444;">
-            <div class="shield" style="margin: 0 auto 10px; width: 30px; height: 40px;"><i class="fa-solid fa-landmark" style="font-size: 15px;"></i></div>
-            <div style="font-size: 0.7rem; font-weight: bold; color: var(--light-gold);">DPWI FREE STATE</div>
+        <div class="sidebar-header">
+            <div class="shield-icon" style="margin: 0 auto 10px; width: 35px; height: 45px;"><i class="fa-solid fa-landmark" style="font-size: 18px;"></i></div>
+            <h2 style="font-size: 0.8rem; color: #F5E642; letter-spacing: 1px;">DPWI FREE STATE</h2>
         </div>
-        <nav style="flex: 1; margin-top: 20px;">
-            <a href="#" class="nav-item active" onclick="navigateTo('employee-dashboard')">
-                <i class="fa-solid fa-house"></i> <span>My Dashboard</span>
+        <nav class="nav-menu">
+            <a class="nav-item active" onclick="showView('dash-home')">
+                <i class="fa-solid fa-gauge-high"></i> <span>My Dashboard</span>
             </a>
-            <a href="#" class="nav-item" onclick="navigateTo('leave-application-view')">
-                <i class="fa-solid fa-plus"></i> <span>Apply for Leave</span>
+            <a class="nav-item" onclick="showView('apply-leave')">
+                <i class="fa-solid fa-file-circle-plus"></i> <span>Apply for Leave</span>
             </a>
-            <a href="#" class="nav-item" onclick="navigateTo('my-applications-list')">
-                <i class="fa-solid fa-list-ul"></i> <span>My Applications</span>
+            <a class="nav-item" onclick="showView('my-apps')">
+                <i class="fa-solid fa-list-check"></i> <span>My Applications</span>
             </a>
-            <div id="manager-nav" class="hidden">
-                <div style="padding: 15px 25px; font-size: 0.7rem; color: #777; text-transform: uppercase; font-weight: bold;">Management</div>
-                <a href="#" class="nav-item" onclick="navigateTo('manager-dashboard')">
-                    <i class="fa-solid fa-users-gear"></i> <span>Team Requests</span>
+            <div id="mgr-nav" class="hidden">
+                <div style="padding: 20px 25px 10px; font-size: 0.7rem; color: #777; font-weight: bold; text-transform: uppercase;">Management</div>
+                <a class="nav-item" onclick="showView('mgr-dash')">
+                    <i class="fa-solid fa-people-roof"></i> <span>Team Requests</span>
                 </a>
             </div>
         </nav>
-        <a href="#" class="nav-item" onclick="logout()" style="border-top: 1px solid #444;">
-            <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
-        </a>
+        <div style="margin-top: auto; padding-bottom: 20px;">
+            <a class="nav-item" onclick="logout()">
+                <i class="fa-solid fa-power-off"></i> <span>Logout</span>
+            </a>
+        </div>
     </aside>
 
-    <main id="content">
-        <header>
-            <div class="logo-box">
-                <div class="shield" style="width: 30px; height: 40px;"><i class="fa-solid fa-landmark" style="font-size: 15px;"></i></div>
-                <div class="logo-text" style="font-size: 0.9rem;">public works &<br>infrastructure</div>
+    <!-- Content Area -->
+    <main id="content-area">
+        <header class="top-header">
+            <div class="logo-text-box">
+                <span style="font-weight: 800; color: #1B5E20; border-left: 3px solid #8B6914; padding-left: 10px;">Leave Management Portal</span>
             </div>
-            <div class="user-profile">
-                <span id="welcome-msg" style="font-weight: 500;">Welcome, User</span>
-                <button class="btn btn-primary" onclick="logout()" style="padding: 5px 12px; font-size: 0.8rem;">Logout</button>
+            <div class="user-info">
+                <span id="user-display-name" style="font-weight: 600; font-size: 0.9rem;"></span>
+                <div style="width: 35px; height: 35px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
             </div>
         </header>
 
-        <div id="view-container" style="padding: 30px;">
-            
+        <div class="view-container">
             <!-- EMPLOYEE DASHBOARD HOME -->
-            <section id="employee-dashboard" class="view-section">
-                <h2 style="margin-bottom: 20px;">Dashboard Overview</h2>
+            <section id="view-dash-home" class="app-view">
+                <h2 style="margin-bottom: 25px;">Dashboard Overview</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div><h3>Total Applications</h3><p id="stat-total">0</p></div>
-                        <i class="fa-solid fa-file-lines stat-icon"></i>
+                        <div>
+                            <div class="stat-label">Total Applied</div>
+                            <div class="stat-val" id="stat-total">0</div>
+                        </div>
+                        <div class="stat-icon-circle"><i class="fa-solid fa-folder-open"></i></div>
                     </div>
-                    <div class="stat-card" style="border-left-color: var(--pending);">
-                        <div><h3>Pending</h3><p id="stat-pending">0</p></div>
-                        <i class="fa-solid fa-clock stat-icon" style="color: var(--pending);"></i>
+                    <div class="stat-card" style="border-color: #ff9800;">
+                        <div>
+                            <div class="stat-label">Pending Approval</div>
+                            <div class="stat-val" id="stat-pending">0</div>
+                        </div>
+                        <div class="stat-icon-circle" style="color: #ff9800;"><i class="fa-solid fa-hourglass-half"></i></div>
                     </div>
-                    <div class="stat-card" style="border-left-color: var(--approved);">
-                        <div><h3>Approved</h3><p id="stat-approved">0</p></div>
-                        <i class="fa-solid fa-circle-check stat-icon" style="color: var(--approved);"></i>
-                    </div>
-                    <div class="stat-card" style="border-left-color: var(--rejected);">
-                        <div><h3>Rejected</h3><p id="stat-rejected">0</p></div>
-                        <i class="fa-solid fa-circle-xmark stat-icon" style="color: var(--rejected);"></i>
+                    <div class="stat-card" style="border-color: #4caf50;">
+                        <div>
+                            <div class="stat-label">Approved</div>
+                            <div class="stat-val" id="stat-approved">0</div>
+                        </div>
+                        <div class="stat-icon-circle" style="color: #4caf50;"><i class="fa-solid fa-check-double"></i></div>
                     </div>
                 </div>
-            </section>
 
-            <!-- MY APPLICATIONS LIST -->
-            <section id="my-applications-list" class="view-section hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>My Applications</h2>
-                    <button class="btn btn-primary" onclick="navigateTo('leave-application-view')">New Application</button>
-                </div>
                 <div class="card">
-                    <div class="table-container">
-                        <table>
+                    <h3 style="margin-bottom: 15px; font-size: 1rem;">Recent Applications</h3>
+                    <div class="table-responsive">
+                        <table id="recent-table">
                             <thead>
                                 <tr>
-                                    <th>Date Applied</th>
-                                    <th>Leave Type</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
                                     <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Days</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="my-apps-tbody">
-                                <!-- Rows added dynamically -->
+                            <tbody>
+                                <!-- Rows populated by JS -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
+            <!-- MY APPLICATIONS FULL LIST -->
+            <section id="view-my-apps" class="app-view hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2>My Application History</h2>
+                    <button class="btn btn-primary" onclick="showView('apply-leave')"><i class="fa-solid fa-plus"></i> New Application</button>
+                </div>
+                <div class="card">
+                    <div class="table-responsive">
+                        <table id="full-history-table">
+                            <thead>
+                                <tr>
+                                    <th>Ref ID</th>
+                                    <th>Applied On</th>
+                                    <th>Leave Type</th>
+                                    <th>Duration</th>
+                                    <th>Days</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <!-- LEAVE APPLICATION FORM -->
-            <section id="leave-application-view" class="view-section hidden">
+            <section id="view-apply-leave" class="app-view hidden">
                 <div class="no-print" style="margin-bottom: 20px; display: flex; gap: 10px;">
-                    <button class="btn btn-primary" onclick="submitLeaveForm()"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
+                    <button class="btn btn-primary" onclick="processLeaveSubmission()"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
                     <button class="btn btn-gold" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+                    <button class="btn" style="background: #eee;" onclick="showView('dash-home')">Cancel</button>
                 </div>
 
-                <div class="leave-form-container">
-                    <div class="form-header-official">
-                        <h2 style="text-transform: uppercase;">Application for Leave of Absence</h2>
-                        <p style="font-weight: bold;">Department of Public Works and Infrastructure - Free State Province</p>
-                        <p style="font-size: 0.8rem;">With effect from 19 May 2021</p>
+                <div class="leave-form-wrapper" id="printable-area">
+                    <div class="official-header">
+                        <h1>Application for Leave of Absence</h1>
+                        <p style="font-weight: 700;">DEPARTMENT OF PUBLIC WORKS AND INFRASTRUCTURE</p>
+                        <p style="font-size: 0.8rem; color: #555;">FREE STATE PROVINCIAL GOVERNMENT</p>
                     </div>
 
-                    <div class="form-section-title">Personal Details</div>
-                    <div class="grid-2">
+                    <div class="form-section-head">Personal Details</div>
+                    <div class="form-row">
                         <div class="form-group"><label>Surname *</label><input type="text" id="f-surname" required></div>
                         <div class="form-group"><label>Initials *</label><input type="text" id="f-initials" required></div>
                         <div class="form-group"><label>PERSAL Number *</label><input type="text" id="f-persal" required></div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group"><label>Email Address</label><input type="text" id="f-email" readonly></div>
-                        <div class="form-group"><label>Telephone</label><input type="text" id="f-tel"></div>
+                        <div class="form-group"><label>Telephone / Cell</label><input type="text" id="f-tel"></div>
                         <div class="form-group"><label>Department</label><input type="text" value="Public Works and Infrastructure" readonly></div>
                     </div>
-                    <div class="form-group"><label>Component / Office</label><input type="text" id="f-office"></div>
-                    <div class="form-group"><label>Address During Leave Period</label><textarea id="f-address" rows="2"></textarea></div>
+                    <div class="form-group"><label>Address During Leave Period</label><input type="text" id="f-address"></div>
                     
-                    <div class="grid-2">
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Shift Worker?</label>
                             <input type="radio" name="shift" value="Yes"> Yes &nbsp;
@@ -202,273 +231,291 @@
                         </div>
                     </div>
 
-                    <div class="form-section-title">SECTION A: Full Day Leave (Select One)</div>
-                    <table class="leave-table">
-                        <thead><tr><th>Select</th><th>Leave Type</th><th>End Date</th><th>Working Days</th></tr></thead>
-                        <tbody>
-                            <tr><td><input type="radio" name="leaveType" value="Annual Leave"></td><td>Annual Leave</td><td rowspan="10"><input type="date" id="f-end-date"></td><td rowspan="10"><input type="number" id="f-days"></td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Normal Sick Leave"></td><td>Normal Sick Leave (Support evidence)</td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Temporary Incapacity Leave"></td><td>Temporary Incapacity Leave</td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Occupational Injuries"></td><td>Leave for Occupational Injuries/Diseases</td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Adoption Leave"></td><td>Adoption Leave</td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Family Responsibility Leave"></td><td>Family Responsibility Leave</td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Pre-natal Leave"></td><td>Pre-natal Leave</td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Paternity Leave"></td><td>Paternity Leave</td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Special Leave"></td><td>Special Leave: <input type="text" placeholder="Type..." style="width:100px; padding:2px;"></td></tr>
-                            <tr><td><input type="radio" name="leaveType" value="Union Leave"></td><td>Leave for Union Office Bearers</td></tr>
-                        </tbody>
+                    <div class="form-section-head">Section A: Full Day Leave (Check one)</div>
+                    <table class="official-table">
+                        <tr>
+                            <th width="10%">Select</th>
+                            <th width="50%">Nature of Leave</th>
+                            <th width="20%">Start Date</th>
+                            <th width="20%">Working Days</th>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Annual"></td>
+                            <td>Annual Leave</td>
+                            <td rowspan="8"><input type="date" id="f-start"></td>
+                            <td rowspan="8"><input type="number" id="f-days"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Sick"></td>
+                            <td>Normal Sick Leave (Support evidence required)</td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Family Responsibility"></td>
+                            <td>Family Responsibility Leave</td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Maternity"></td>
+                            <td>Maternity Leave</td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Paternity"></td>
+                            <td>Paternity Leave</td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Adoption"></td>
+                            <td>Adoption Leave</td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Pre-natal"></td>
+                            <td>Pre-natal Leave</td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="leaveType" value="Special"></td>
+                            <td>Special Leave: <input type="text" style="width: 150px; border-bottom: 1px solid #000; border-top:none; border-left:none; border-right:none;"></td>
+                        </tr>
                     </table>
 
-                    <p style="font-weight: bold; margin-bottom: 5px;">Calendar Days / Months Section</p>
-                    <div class="grid-2">
-                        <div class="form-group"><label>Start Date</label><input type="date" id="f-start-date"></div>
-                        <div class="form-group"><label>Unpaid Leave Motivation</label><textarea id="f-motivation" rows="1"></textarea></div>
-                    </div>
-
-                    <div class="form-section-title">SECTION B: Partial Day Leave</div>
-                    <table class="leave-table">
-                        <thead><tr><th>Date</th><th>Start Time</th><th>End Time</th><th>Hours</th><th>Min</th></tr></thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="date" id="f-p-date"></td>
-                                <td><input type="time" id="f-p-start"></td>
-                                <td><input type="time" id="f-p-end"></td>
-                                <td><input type="number" id="f-p-h" style="width:50px;"></td>
-                                <td><input type="number" id="f-p-m" style="width:50px;"></td>
-                            </tr>
-                        </tbody>
+                    <div class="form-section-head">Section B: Partial Day Leave</div>
+                    <table class="official-table">
+                        <tr>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Total Hours</th>
+                            <th>Minutes</th>
+                        </tr>
+                        <tr>
+                            <td><input type="date" style="width: 100%;"></td>
+                            <td><input type="time" style="width: 100%;"></td>
+                            <td><input type="time" style="width: 100%;"></td>
+                            <td><input type="number" style="width: 100%;"></td>
+                            <td><input type="number" style="width: 100%;"></td>
+                        </tr>
                     </table>
 
-                    <div class="certification-box">
-                        "I hereby certify that I have acquainted myself with my available leave credits and with the rules governing the leave I have applied for. Further, I am certifying that the information provided is correct. Any falsification of information in this regard may form ground for disciplinary action."
-                        <div class="grid-2" style="margin-top: 15px;">
-                            <div><label>Signature (Full Name):</label><br><input type="text" id="f-signature" style="border:none; border-bottom:1px solid #000; width:100%;"></div>
-                            <div><label>Date:</label><br><input type="text" id="f-curr-date" readonly style="border:none; border-bottom:1px solid #000; width:100%;"></div>
+                    <div class="signature-box">
+                        <p style="font-size: 0.8rem; font-style: italic; margin-bottom: 15px;">
+                            I hereby certify that I have acquainted myself with my available leave credits and with the rules governing the leave I have applied for. Further, I am certifying that the information provided is correct. Any falsification of information in this regard may form ground for disciplinary action.
+                        </p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Electronic Signature (Type Full Name)</label>
+                                <input type="text" id="f-sig" placeholder="Full Legal Name">
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Application</label>
+                                <input type="text" id="f-date-now" readonly>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-section-title">SUPERVISOR RECOMMENDATION SECTION (Official Use)</div>
-                    <div class="grid-2">
-                        <div>
+                    <div class="form-section-head" style="background: #555;">Supervisor Recommendation (Official Use)</div>
+                    <div class="form-row">
+                        <div style="font-size: 0.85rem;">
                             <input type="checkbox" disabled> Recommended <br>
                             <input type="checkbox" disabled> Not Recommended <br>
                             <input type="checkbox" disabled> Rescheduled
                         </div>
-                        <div>
-                            <label>Supervisor Name:</label><br>
-                            <div style="height: 30px; border-bottom: 1px solid #000;"></div>
+                        <div class="form-group">
+                            <label>Supervisor Remarks</label>
+                            <div style="height: 60px; border: 1px solid #ddd;"></div>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-top:10px;">
-                        <label>Remarks:</label>
-                        <div style="height: 40px; border-bottom: 1px solid #000;"></div>
-                    </div>
-                    <div style="text-align: right; margin-top: 20px; font-weight: bold;">
-                        REPUBLIC OF SOUTH AFRICA
-                    </div>
+                    <p style="text-align: right; font-weight: bold; margin-top: 20px;">REPUBLIC OF SOUTH AFRICA</p>
                 </div>
             </section>
 
             <!-- MANAGER DASHBOARD -->
-            <section id="manager-dashboard" class="view-section hidden">
-                <h2 style="margin-bottom: 20px;">Manager Approval Dashboard</h2>
+            <section id="view-mgr-dash" class="app-view hidden">
+                <h2 style="margin-bottom: 25px;">Team Leave Requests</h2>
                 <div class="stats-grid">
-                    <div class="stat-card" style="border-left-color: var(--pending);">
-                        <div><h3>Pending Review</h3><p id="m-stat-pending">0</p></div>
+                    <div class="stat-card" style="border-color: #ff9800;">
+                        <div>
+                            <div class="stat-label">Pending Approval</div>
+                            <div class="stat-val" id="mgr-stat-pending">0</div>
+                        </div>
                     </div>
-                    <div class="stat-card" style="border-left-color: var(--approved);">
-                        <div><h3>Total Approved</h3><p id="m-stat-approved">0</p></div>
+                    <div class="stat-card" style="border-color: #4caf50;">
+                        <div>
+                            <div class="stat-label">Approved Today</div>
+                            <div class="stat-val" id="mgr-stat-approved">0</div>
+                        </div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="table-container">
-                        <table>
+                    <div class="table-responsive">
+                        <table id="manager-table">
                             <thead>
                                 <tr>
                                     <th>Employee</th>
-                                    <th>Leave Type</th>
+                                    <th>Type</th>
                                     <th>Start Date</th>
-                                    <th>End Date</th>
                                     <th>Days</th>
+                                    <th>Applied On</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="manager-apps-tbody">
-                                <!-- Dynamic rows -->
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
             </section>
-
         </div>
     </main>
 </div>
 
-<!-- View Application Modal -->
-<div id="view-modal" class="modal-overlay hidden">
+<!-- MODAL FOR VIEWING -->
+<div id="modal-container" class="modal-backdrop hidden">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal()">&times;</span>
-        <div id="modal-body-content" style="padding: 20px;"></div>
+        <div id="modal-data"></div>
     </div>
 </div>
 
-<!-- Toast Notification -->
-<div id="toast"></div>
+<!-- TOAST NOTIFICATIONS -->
+<div id="toast-container"></div>
 
 <script>
-    // ===== EMAILJS CONFIG - UPDATE THESE =====
-    const EMAILJS_SERVICE_ID = 'service_default';
-    const EMAILJS_TEMPLATE_ID = 'template_leave_app';  
-    const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY_HERE';
-    // =========================================
+    // ===== EMAILJS CONFIG =====
+    const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
+    const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  
+    const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+    
+    if (EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+    }
 
-    // Initialize EmailJS
-    (function() {
-        if(EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-        }
-    })();
-
-    // Data Management
-    let currentUser = JSON.parse(localStorage.getItem('dpwi_user')) || null;
-    let applications = JSON.parse(localStorage.getItem('dpwi_apps')) || [];
+    // ===== APP STATE =====
+    let currentUser = JSON.parse(localStorage.getItem('dpwi_session')) || null;
     let users = JSON.parse(localStorage.getItem('dpwi_users')) || [
-        { name: 'Darlington Test', email: 'darlington1717@gmail.com', password: 'password123', role: 'Manager', dept: 'Public Works' }
+        { name: 'Admin Test', email: 'darlington1717@gmail.com', password: 'password123', role: 'Manager', dept: 'Public Works' }
     ];
+    let applications = JSON.parse(localStorage.getItem('dpwi_apps')) || [];
 
-    // Auth Tabs Logic
-    function showAuthTab(tab) {
+    // ===== AUTH LOGIC =====
+    function switchAuth(type) {
         const loginForm = document.getElementById('login-form');
         const regForm = document.getElementById('register-form');
-        const tabs = document.querySelectorAll('.tab-btn');
-        
-        if(tab === 'login') {
+        const tabLogin = document.getElementById('tab-login');
+        const tabReg = document.getElementById('tab-register');
+
+        if (type === 'login') {
             loginForm.classList.remove('hidden');
             regForm.classList.add('hidden');
-            tabs[0].classList.add('active');
-            tabs[1].classList.remove('active');
+            tabLogin.classList.add('active');
+            tabReg.classList.remove('active');
         } else {
             loginForm.classList.add('hidden');
             regForm.classList.remove('hidden');
-            tabs[1].classList.add('active');
-            tabs[0].classList.remove('active');
+            tabReg.classList.add('active');
+            tabLogin.classList.remove('active');
         }
     }
 
-    // Authentication Logic
-    document.getElementById('login-form').onsubmit = (e) => {
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const pass = document.getElementById('reg-pass').value;
+        const confirm = document.getElementById('reg-confirm').value;
+        const role = document.getElementById('reg-role').value;
+
+        if (!email.endsWith('@fsworks.gov.za') && email !== 'darlington1717@gmail.com') {
+            return showToast('Error: Must use a @fsworks.gov.za email address.', 'danger');
+        }
+        if (pass !== confirm) {
+            return showToast('Error: Passwords do not match.', 'danger');
+        }
+        if (users.find(u => u.email === email)) {
+            return showToast('Error: Email already registered.', 'danger');
+        }
+
+        users.push({ name, email, password: pass, role, dept: 'Public Works and Infrastructure' });
+        localStorage.setItem('dpwi_users', JSON.stringify(users));
+        showToast('Account created! Please login.', 'success');
+        switchAuth('login');
+    });
+
+    document.getElementById('login-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
         const pass = document.getElementById('login-password').value;
 
         const user = users.find(u => u.email === email && u.password === pass);
-        if(user) {
-            loginSuccess(user);
+        if (user) {
+            currentUser = user;
+            localStorage.setItem('dpwi_session', JSON.stringify(user));
+            initApp();
         } else {
-            showToast('Invalid credentials', 'error');
+            showToast('Invalid email or password.', 'danger');
         }
-    };
-
-    document.getElementById('register-form').onsubmit = (e) => {
-        e.preventDefault();
-        const name = document.getElementById('reg-name').value;
-        const email = document.getElementById('reg-email').value;
-        const pass = document.getElementById('reg-password').value;
-        const confirm = document.getElementById('reg-confirm').value;
-        const role = document.getElementById('reg-role').value;
-        const dept = document.getElementById('reg-dept').value;
-
-        if(!email.endsWith('@fsworks.gov.za') && email !== 'darlington1717@gmail.com') {
-            showToast('Only @fsworks.gov.za emails allowed', 'error');
-            return;
-        }
-        if(pass !== confirm) {
-            showToast('Passwords do not match', 'error');
-            return;
-        }
-        if(users.some(u => u.email === email)) {
-            showToast('Email already registered', 'error');
-            return;
-        }
-
-        const newUser = { name, email, password: pass, role, dept };
-        users.push(newUser);
-        localStorage.setItem('dpwi_users', JSON.stringify(users));
-        showToast('Registration successful! Please login.', 'success');
-        showAuthTab('login');
-    };
-
-    function loginSuccess(user) {
-        currentUser = user;
-        localStorage.setItem('dpwi_user', JSON.stringify(user));
-        document.getElementById('auth-page').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('welcome-msg').innerText = `Welcome, ${user.name}`;
-        
-        if(user.role === 'Manager' || user.role === 'HR Admin') {
-            document.getElementById('manager-nav').classList.remove('hidden');
-        } else {
-            document.getElementById('manager-nav').classList.add('hidden');
-        }
-
-        // Fill leave form defaults
-        document.getElementById('f-email').value = user.email;
-        document.getElementById('f-curr-date').value = new Date().toLocaleDateString();
-
-        renderDashboard();
-        navigateTo('employee-dashboard');
-    }
+    });
 
     function logout() {
-        localStorage.removeItem('dpwi_user');
-        currentUser = null;
+        localStorage.removeItem('dpwi_session');
         location.reload();
     }
 
-    // Navigation
-    function navigateTo(viewId) {
-        document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-        document.getElementById(viewId).classList.remove('hidden');
+    // ===== NAVIGATION & UI =====
+    function showView(viewId) {
+        document.querySelectorAll('.app-view').forEach(v => v.classList.add('hidden'));
+        document.getElementById('view-' + viewId).classList.remove('hidden');
         
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        const activeItem = Array.from(document.querySelectorAll('.nav-item')).find(i => i.getAttribute('onclick').includes(viewId));
-        if(activeItem) activeItem.classList.add('active');
+        // Highlight active nav
+        const items = document.querySelectorAll('.nav-item');
+        items.forEach(item => {
+            if (item.getAttribute('onclick').includes(viewId)) {
+                item.classList.add('active');
+            }
+        });
 
-        if(viewId === 'employee-dashboard') renderDashboard();
-        if(viewId === 'my-applications-list') renderMyApplications();
-        if(viewId === 'manager-dashboard') renderManagerDashboard();
+        if (viewId === 'dash-home') renderDashboard();
+        if (viewId === 'my-apps') renderMyApps();
+        if (viewId === 'mgr-dash') renderManagerDash();
+        if (viewId === 'apply-leave') {
+            document.getElementById('f-email').value = currentUser.email;
+            document.getElementById('f-date-now').value = new Date().toLocaleDateString();
+        }
     }
 
-    // Leave Submission
-    function submitLeaveForm() {
-        const typeEl = document.querySelector('input[name="leaveType"]:checked');
-        const surname = document.getElementById('f-surname').value;
-        const startDate = document.getElementById('f-start-date').value;
-        const endDate = document.getElementById('f-end-date').value;
-        const days = document.getElementById('f-days').value;
+    function initApp() {
+        document.getElementById('auth-page').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('user-display-name').innerText = currentUser.name;
+        
+        if (currentUser.role === 'Manager' || currentUser.role === 'HR Admin') {
+            document.getElementById('mgr-nav').classList.remove('hidden');
+        }
+        showView('dash-home');
+    }
 
-        if(!typeEl || !surname || !startDate || !endDate || !days) {
-            showToast('Please fill all required fields (*)', 'error');
-            return;
+    // ===== LEAVE LOGIC =====
+    function processLeaveSubmission() {
+        const leaveType = document.querySelector('input[name="leaveType"]:checked');
+        const surname = document.getElementById('f-surname').value;
+        const startDate = document.getElementById('f-start').value;
+        const days = document.getElementById('f-days').value;
+        const sig = document.getElementById('f-sig').value;
+
+        if (!leaveType || !surname || !startDate || !days || !sig) {
+            return showToast('Please complete all required fields (*).', 'danger');
         }
 
         const newApp = {
-            id: Date.now(),
-            applicantName: currentUser.name,
+            id: 'REF' + Math.floor(1000 + Math.random() * 9000),
             applicantEmail: currentUser.email,
-            surname: surname,
+            applicantName: currentUser.name,
+            surname,
             initials: document.getElementById('f-initials').value,
             persal: document.getElementById('f-persal').value,
-            leaveType: typeEl.value,
-            startDate: startDate,
-            endDate: endDate,
-            days: days,
+            leaveType: leaveType.value,
+            startDate,
+            days,
             status: 'Pending',
             appliedOn: new Date().toLocaleDateString(),
             details: {
                 tel: document.getElementById('f-tel').value,
-                office: document.getElementById('f-office').value,
                 address: document.getElementById('f-address').value
             }
         };
@@ -477,130 +524,130 @@
         localStorage.setItem('dpwi_apps', JSON.stringify(applications));
 
         // EmailJS Trigger
-        const templateParams = {
-            to_email: 'darlington1717@gmail.com',
-            employee_name: currentUser.name,
-            leave_type: newApp.leaveType,
-            start_date: newApp.startDate,
-            end_date: newApp.endDate,
-            days: newApp.days,
-            confirmation_email: currentUser.email
-        };
-
-        if(EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                .then(() => console.log('Email sent'))
-                .catch(err => console.error('Email failed', err));
+        if (EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_email: 'darlington1717@gmail.com',
+                employee: currentUser.name,
+                type: newApp.leaveType,
+                days: newApp.days,
+                start: newApp.startDate
+            });
         }
 
-        showToast('Application submitted successfully!', 'success');
-        navigateTo('my-applications-list');
+        showToast('Application submitted! Email notification sent.', 'success');
+        showView('my-apps');
     }
 
-    // Rendering Dashboards
     function renderDashboard() {
-        const myApps = applications.filter(a => a.applicantEmail === currentUser.email);
-        document.getElementById('stat-total').innerText = myApps.length;
-        document.getElementById('stat-pending').innerText = myApps.filter(a => a.status === 'Pending').length;
-        document.getElementById('stat-approved').innerText = myApps.filter(a => a.status === 'Approved').length;
-        document.getElementById('stat-rejected').innerText = myApps.filter(a => a.status === 'Rejected').length;
-    }
+        const userApps = applications.filter(a => a.applicantEmail === currentUser.email);
+        document.getElementById('stat-total').innerText = userApps.length;
+        document.getElementById('stat-pending').innerText = userApps.filter(a => a.status === 'Pending').length;
+        document.getElementById('stat-approved').innerText = userApps.filter(a => a.status === 'Approved').length;
 
-    function renderMyApplications() {
-        const tbody = document.getElementById('my-apps-tbody');
-        const myApps = applications.filter(a => a.applicantEmail === currentUser.email).sort((a,b) => b.id - a.id);
-        
-        tbody.innerHTML = myApps.map(app => `
+        const tbody = document.querySelector('#recent-table tbody');
+        tbody.innerHTML = userApps.slice(-5).reverse().map(app => `
             <tr>
                 <td>${app.appliedOn}</td>
                 <td>${app.leaveType}</td>
                 <td>${app.startDate}</td>
-                <td>${app.endDate}</td>
-                <td>${app.days}</td>
                 <td><span class="badge badge-${app.status.toLowerCase()}">${app.status}</span></td>
-                <td>
-                    <button class="btn btn-primary" style="padding:5px 10px; font-size:0.7rem;" onclick="viewApp(${app.id})">VIEW</button>
-                </td>
+                <td><button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.7rem;" onclick="viewFullApp('${app.id}')">View</button></td>
             </tr>
-        `).join('') || '<tr><td colspan="7" style="text-align:center;">No applications found</td></tr>';
+        `).join('');
     }
 
-    function renderManagerDashboard() {
-        const tbody = document.getElementById('manager-apps-tbody');
-        const pending = applications.filter(a => a.status === 'Pending');
-        const approved = applications.filter(a => a.status === 'Approved');
+    function renderMyApps() {
+        const tbody = document.querySelector('#full-history-table tbody');
+        const userApps = applications.filter(a => a.applicantEmail === currentUser.email).reverse();
+        tbody.innerHTML = userApps.map(app => `
+            <tr>
+                <td>#${app.id}</td>
+                <td>${app.appliedOn}</td>
+                <td>${app.leaveType}</td>
+                <td>${app.startDate}</td>
+                <td>${app.days}</td>
+                <td><span class="badge badge-${app.status.toLowerCase()}">${app.status}</span></td>
+                <td><button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.7rem;" onclick="viewFullApp('${app.id}')">Details</button></td>
+            </tr>
+        `).join('');
+    }
 
-        document.getElementById('m-stat-pending').innerText = pending.length;
-        document.getElementById('m-stat-approved').innerText = approved.length;
+    function renderManagerDash() {
+        const tbody = document.querySelector('#manager-table tbody');
+        const pending = applications.filter(a => a.status === 'Pending');
+        const approvedCount = applications.filter(a => a.status === 'Approved').length;
+        
+        document.getElementById('mgr-stat-pending').innerText = pending.length;
+        document.getElementById('mgr-stat-approved').innerText = approvedCount;
 
         tbody.innerHTML = pending.map(app => `
             <tr>
-                <td>${app.applicantName}</td>
+                <td><strong>${app.applicantName}</strong><br><small>${app.applicantEmail}</small></td>
                 <td>${app.leaveType}</td>
                 <td>${app.startDate}</td>
-                <td>${app.endDate}</td>
                 <td>${app.days}</td>
-                <td>
-                    <button class="btn btn-primary" style="padding:5px 10px; font-size:0.7rem;" onclick="handleApp(${app.id}, 'Approved')">APPROVE</button>
-                    <button class="btn btn-danger" style="padding:5px 10px; font-size:0.7rem;" onclick="handleApp(${app.id}, 'Rejected')">REJECT</button>
+                <td>${app.appliedOn}</td>
+                <td style="display: flex; gap: 5px;">
+                    <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.7rem;" onclick="updateStatus('${app.id}', 'Approved')">Approve</button>
+                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="updateStatus('${app.id}', 'Rejected')">Reject</button>
                 </td>
             </tr>
-        `).join('') || '<tr><td colspan="6" style="text-align:center;">No pending requests</td></tr>';
+        `).join('') || '<tr><td colspan="6" style="text-align:center; padding: 20px;">No pending applications found.</td></tr>';
     }
 
-    function handleApp(id, status) {
-        const app = applications.find(a => a.id === id);
-        if(status === 'Rejected') {
-            const reason = prompt("Enter rejection reason:");
-            if(!reason) return;
-            app.rejectionReason = reason;
+    function updateStatus(appId, status) {
+        const app = applications.find(a => a.id === appId);
+        if (app) {
+            app.status = status;
+            localStorage.setItem('dpwi_apps', JSON.stringify(applications));
+            showToast(`Application ${status} successfully.`, 'success');
+            renderManagerDash();
         }
-        app.status = status;
-        localStorage.setItem('dpwi_apps', JSON.stringify(applications));
-        showToast(`Application ${status}`, 'success');
-        renderManagerDashboard();
     }
 
-    function viewApp(id) {
-        const app = applications.find(a => a.id === id);
-        const modal = document.getElementById('view-modal');
-        const content = document.getElementById('modal-body-content');
-        
-        content.innerHTML = `
-            <h3>Application Details</h3>
-            <hr style="margin: 15px 0;">
-            <div class="grid-2">
-                <div><strong>Applicant:</strong> ${app.applicantName}</div>
-                <div><strong>Status:</strong> ${app.status}</div>
-                <div><strong>Type:</strong> ${app.leaveType}</div>
-                <div><strong>Duration:</strong> ${app.startDate} to ${app.endDate} (${app.days} days)</div>
-                <div><strong>PERSAL:</strong> ${app.persal}</div>
-                <div><strong>Applied On:</strong> ${app.appliedOn}</div>
+    function viewFullApp(appId) {
+        const app = applications.find(a => a.id === appId);
+        const modalData = document.getElementById('modal-data');
+        modalData.innerHTML = `
+            <h2 class="text-primary" style="margin-bottom: 20px;">Application Details #${app.id}</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem;">
+                <div><strong>Employee:</strong><br>${app.applicantName}</div>
+                <div><strong>PERSAL:</strong><br>${app.persal}</div>
+                <div><strong>Type:</strong><br>${app.leaveType}</div>
+                <div><strong>Duration:</strong><br>${app.days} Day(s)</div>
+                <div><strong>Start Date:</strong><br>${app.startDate}</div>
+                <div><strong>Status:</strong><br><span class="badge badge-${app.status.toLowerCase()}">${app.status}</span></div>
+                <div style="grid-column: span 2;"><strong>Address:</strong><br>${app.details.address || 'N/A'}</div>
             </div>
-            ${app.rejectionReason ? `<div style="margin-top:15px; color:red;"><strong>Rejection Reason:</strong> ${app.rejectionReason}</div>` : ''}
+            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px; text-align: right;">
+                <button class="btn btn-gold" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Details</button>
+            </div>
         `;
-        modal.classList.remove('hidden');
+        document.getElementById('modal-container').classList.remove('hidden');
     }
 
     function closeModal() {
-        document.getElementById('view-modal').classList.add('hidden');
+        document.getElementById('modal-container').classList.add('hidden');
     }
 
     function showToast(msg, type) {
-        const toast = document.getElementById('toast');
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        if (type === 'danger') toast.style.background = '#d32f2f';
+        if (type === 'success') toast.style.background = '#4caf50';
         toast.innerText = msg;
-        toast.className = `toast-${type} show`;
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
     }
 
-    // Initialize session
-    window.onload = () => {
-        if(currentUser) loginSuccess(currentUser);
-    };
+    // On Load
+    if (currentUser) {
+        initApp();
+    }
 
-    // TO SHARE THIS APP:
-    // 1. Upload this file to netlify.com (drag and drop - free)
-    // 2. You get a link like: https://yourapp.netlify.app
-    // 3. Share that link with anyone - they can register and use the full app
-    // 4. To update: just drag the new HTML file to Netlify again
+    // Netlify Hosting Tip:
+    // 1. Save this entire content as index.html
+    // 2. Drag and drop it into Netlify Drop (app.netlify.com/drop)
+    // 3. Your professional portal is live!
 </script>

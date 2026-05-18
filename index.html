@@ -22,48 +22,14 @@
        PAGE 1: LOGIN / REGISTER (WITH LOGO BG)
        ========================================= */
     #auth-page {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    background:
-        linear-gradient(rgba(17, 70, 22, 0.90), rgba(8, 40, 12, 0.95)),
-        url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1600&auto=format&fit=crop');
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-    <div class="official-logo">
-    <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="Public Works">
-</div>
-    .official-logo {
-    text-align: center;
-    margin-bottom: 22px;
-}
-
-.official-logo img {
-    width: 250px;
-    max-width: 100%;
-    object-fit: contain;
-    background: transparent;
-}
-    .auth-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url('https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png') center no-repeat;
-    background-size: 180px;
-    opacity: 0.04;
-    pointer-events: none;
-}
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        /* Background uses a dark green gradient overlay on the provided logo */
+        background: linear-gradient(rgba(27, 94, 32, 0.94), rgba(10, 46, 12, 0.96)), 
+                    var(--logo-url);
+        background-size: 600px;
+        background-position: center;
+        display: flex; align-items: center; justify-content: center; z-index: 2000;
+    }
     
     .auth-container { 
         width: 100%; max-width: 500px; background: white; border-radius: 12px; 
@@ -217,457 +183,80 @@
     }
 </style>
 
-<div id="top-accent-border"></div>
+<style>
+    :root {
+        --primary-green: #1B5E20;
+        --gold-official: #8B6914;
+        --light-gold: #F5E642;
+        --white: #FFFFFF;
+        --sidebar-width: 280px;
+        --pending: #f39c12;
+        --approved: #27ae60;
+        --rejected: #c0392b;
+        /* Using the digital South Africa flag image provided */
+        --bg-image: url('https://static.vecteezy.com/system/resources/previews/007/633/328/original/digital-transformation-concept-background-with-south-africa-flag-free-vector.jpg');
+        --logo-url: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRz9G7u-73_wMBy693vY4Z-N2f4vH4lC5vK1Q&s');
+    }
 
-<!-- PAGE 1: LOGIN / REGISTER -->
-<div id="auth-page">
-    <div class="auth-container">
-        <div class="auth-header">
-            <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="Department Logo">
-        </div>
-        <div class="auth-tabs">
-            <button class="tab-btn active" id="tab-login-btn" onclick="toggleAuth('login')">LOGIN</button>
-            <button class="tab-btn" id="tab-reg-btn" onclick="toggleAuth('register')">REGISTER</button>
-        </div>
-        <div class="auth-body">
-            <!-- Login -->
-            <form id="login-form">
-                <div class="form-group">
-                    <label>Official Email (@fsworks.gov.za)</label>
-                    <input type="email" id="login-email" placeholder="name@fsworks.gov.za" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit" class="btn btn-submit">Sign Into Secure Portal</button>
-                <p style="text-align: center; margin-top: 20px; font-weight: 700; font-size: 0.8rem; color: var(--gold-official); cursor: pointer;">FORGOT YOUR PASSWORD?</p>
-            </form>
-
-            <!-- Register -->
-            <form id="reg-form" class="hidden">
-                <div class="form-group"><label>Full Legal Name</label><input type="text" id="reg-name" required></div>
-                <div class="form-group"><label>Work Email</label><input type="email" id="reg-email" placeholder="name@fsworks.gov.za" required></div>
-                <div class="form-group">
-                    <label>Assigned Role</label>
-                    <select id="reg-role">
-                        <option value="Employee">Employee</option>
-                        <option value="Manager">Manager / Supervisor</option>
-                        <option value="HR Admin">HR Administrator</option>
-                    </select>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="form-group"><label>Password</label><input type="password" id="reg-pass" required></div>
-                    <div class="form-group"><label>Confirm</label><input type="password" id="reg-confirm" required></div>
-                </div>
-                <button type="submit" class="btn btn-gold">Create Official Account</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- SIDEBAR -->
-<aside id="sidebar">
-    <div class="sidebar-logo-area">
-        <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="Logo">
-        <div style="color: var(--light-gold); font-weight: 900; margin-top: 15px; font-size: 0.75rem; letter-spacing: 1px;">FREE STATE PROVINCE</div>
-    </div>
-    <button class="btn-sidebar-apply" onclick="showView('apply')">
-        <i class="fa-solid fa-plus-circle"></i> Apply for Leave
-    </button>
-    <nav class="nav-menu">
-        <a class="nav-item active" id="nav-dash" onclick="showView('dash')">
-            <i class="fa-solid fa-house-chimney"></i> <span>My Dashboard</span>
-        </a>
-        <a class="nav-item" id="nav-history" onclick="showView('history')">
-            <i class="fa-solid fa-list-check"></i> <span>Application History</span>
-        </a>
-        <div id="manager-nav" class="hidden">
-            <p style="padding: 25px 25px 10px; font-size: 0.7rem; opacity: 0.5; font-weight: 900; color: white; text-transform: uppercase;">Management</p>
-            <a class="nav-item" id="nav-mgr" onclick="showView('mgr')">
-                <i class="fa-solid fa-user-gear"></i> <span>Review Team Requests</span>
-            </a>
-        </div>
-    </nav>
-    <a class="nav-item" onclick="logout()" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); color: var(--light-gold);">
-        <i class="fa-solid fa-power-off"></i> <span>Logout Session</span>
-    </a>
-</aside>
-
-<!-- MAIN CONTENT -->
-<div id="main-wrapper">
-    <header class="app-header">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <div class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></div>
-            <div class="header-logo">
-                <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="DPWI Logo">
-            </div>
-        </div>
-        <div class="user-profile">
-            <div class="user-name-tag" id="user-fullname-display">Full Name</div>
-            <div class="avatar-circle" id="user-initials-display">??</div>
-        </div>
-    </header>
-
-    <div class="view-container">
-        
-        <!-- DASHBOARD -->
-        <section id="view-dash" class="view-content">
-            <h2 style="margin-bottom: 35px; font-weight: 900; color: var(--primary-green); border-bottom: 3px solid var(--gold-official); display: inline-block; padding-bottom: 5px;">Portal Overview</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div><span class="stat-label">Total Applied</span><span class="stat-value" id="stat-val-total" style="color: var(--primary-green);">0</span></div>
-                    <i class="fa-solid fa-file-invoice stat-icon-xl" style="color: var(--primary-green);"></i>
-                </div>
-                <div class="stat-card">
-                    <div><span class="stat-label">Pending</span><span class="stat-value" id="stat-val-pending" style="color: var(--pending);">0</span></div>
-                    <i class="fa-solid fa-hourglass-half stat-icon-xl" style="color: var(--pending);"></i>
-                </div>
-                <div class="stat-card">
-                    <div><span class="stat-label">Approved</span><span class="stat-value" id="stat-val-approved" style="color: var(--approved);">0</span></div>
-                    <i class="fa-solid fa-circle-check stat-icon-xl" style="color: var(--approved);"></i>
-                </div>
-                <div class="stat-card">
-                    <div><span class="stat-label">Rejected</span><span class="stat-value" id="stat-val-rejected" style="color: var(--rejected);">0</span></div>
-                    <i class="fa-solid fa-circle-xmark stat-icon-xl" style="color: var(--rejected);"></i>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title-bar">Recent Applications</div>
-                <div style="overflow-x: auto;">
-                    <table id="table-recent">
-                        <thead>
-                            <tr>
-                                <th>Date Applied</th>
-                                <th>Leave Type</th>
-                                <th>Start Date</th>
-                                <th>Days</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- APPLICATION HISTORY -->
-        <section id="view-history" class="view-content hidden">
-            <h2 style="margin-bottom: 30px; font-weight: 900; color: var(--primary-green);">My Application History</h2>
-            <div class="card">
-                <div style="overflow-x: auto;">
-                    <table id="table-history-full">
-                        <thead>
-                            <tr>
-                                <th>Ref ID</th>
-                                <th>Applied On</th>
-                                <th>Type</th>
-                                <th>Period</th>
-                                <th>Days</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- APPLY FORM -->
-        <section id="view-apply" class="view-content hidden">
-            <div class="no-print" style="margin-bottom: 30px; display: flex; gap: 15px;">
-                <button class="btn btn-submit" onclick="submitNewApplication()" style="flex: 1;"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
-                <button class="btn btn-gold" onclick="window.print()" style="flex: 1;"><i class="fa-solid fa-file-pdf"></i> Download as PDF</button>
-            </div>
-
-            <div class="official-form">
-                <div class="form-header-box">
-                    <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="Logo">
-                    <h2>Application for Leave of Absence</h2>
-                    <p style="font-weight: bold; margin-top: 10px;">DEPARTMENT OF PUBLIC WORKS AND INFRASTRUCTURE - FREE STATE PROVINCE</p>
-                </div>
-
-                <div class="section-divider">1. Personal Information</div>
-                <div class="form-grid">
-                    <div class="form-group"><label>Surname *</label><input type="text" id="f-surname" required></div>
-                    <div class="form-group"><label>Initials *</label><input type="text" id="f-initials" required></div>
-                    <div class="form-group"><label>PERSAL Number *</label><input type="text" id="f-persal" required></div>
-                    <div class="form-group"><label>Contact Number</label><input type="text" id="f-tel"></div>
-                </div>
-
-                <div class="section-divider">2. Leave Details</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Type of Leave Applied For *</label>
-                        <select id="f-type">
-                            <option value="Annual Leave">Annual Leave</option>
-                            <option value="Normal Sick Leave">Normal Sick Leave</option>
-                            <option value="Family Responsibility">Family Responsibility Leave</option>
-                            <option value="Maternity Leave">Maternity Leave</option>
-                            <option value="Paternity Leave">Paternity Leave</option>
-                            <option value="Special Leave">Special Leave</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>No. of Working Days *</label><input type="number" id="f-days" required></div>
-                    <div class="form-group"><label>Start Date *</label><input type="date" id="f-start" required></div>
-                    <div class="form-group"><label>End Date *</label><input type="date" id="f-end" required></div>
-                </div>
-
-                <div class="section-divider">3. Certification & Signatures</div>
-                <div class="sig-box">
-                    I hereby certify that I have acquainted myself with my available leave credits and with the rules governing the leave I have applied for. Further, I am certifying that the information provided is correct. Any falsification of information in this regard may form ground for disciplinary action.
-                </div>
-                <div class="form-grid" style="margin-top: 25px;">
-                    <div class="form-group"><label>Digital Signature (Full Name) *</label><input type="text" id="f-sig" placeholder="Type name to sign"></div>
-                    <div class="form-group"><label>Date</label><input type="text" id="f-date-now" readonly></div>
-                </div>
-
-                <div style="margin-top: 50px; text-align: right; border-top: 1px solid #000; padding-top: 10px;">
-                    <p style="font-weight: 900; font-size: 0.7rem;">REPUBLIC OF SOUTH AFRICA</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- MANAGER VIEW -->
-        <section id="view-mgr" class="view-content hidden">
-            <h2 style="margin-bottom: 30px; font-weight: 900; color: var(--primary-green);">Management Review Queue</h2>
-            <div class="card">
-                <div style="overflow-x: auto;">
-                    <table id="table-manager-queue">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Leave Type</th>
-                                <th>Period</th>
-                                <th>Days</th>
-                                <th>Applied On</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-    </div>
-
-    <footer>
-        © 2026 Department of Public Works and Infrastructure - Free State Province | Republic of South Africa
-    </footer>
-</div>
-
-<!-- NOTIFICATION -->
-<div id="toast">Application Submitted!</div>
-
-<script>
-    // =========================================
-    // APP CONFIG & STATE
-    // =========================================
-    const EMAILJS_PUBLIC_KEY = 'YOUR_KEY';
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
     
-    let currentUser = JSON.parse(localStorage.getItem('dpwi_session')) || null;
-    let apps = JSON.parse(localStorage.getItem('dpwi_apps')) || [];
-    let users = JSON.parse(localStorage.getItem('dpwi_users')) || [
-        { name: 'Darlington Test', email: 'darlington1717@gmail.com', password: '123', role: 'Manager' }
-    ];
-
-    // =========================================
-    // AUTHENTICATION LOGIC
-    // =========================================
-    function toggleAuth(mode) {
-        document.getElementById('login-form').classList.toggle('hidden', mode === 'register');
-        document.getElementById('reg-form').classList.toggle('hidden', mode === 'login');
-        document.getElementById('tab-login-btn').classList.toggle('active', mode === 'login');
-        document.getElementById('tab-reg-btn').classList.toggle('active', mode === 'register');
+    body { 
+        background-image: linear-gradient(rgba(0, 40, 0, 0.7), rgba(0, 20, 0, 0.8)), var(--bg-image);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: #333; 
+        min-height: 100vh; 
+        display: flex; 
+        flex-direction: column;
+        overflow-x: hidden;
     }
 
-    document.getElementById('login-form').onsubmit = (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const pass = document.getElementById('login-password').value;
-        const user = users.find(u => u.email === email && u.password === pass);
+    .hidden { display: none !important; }
 
-        if (user) {
-            currentUser = user;
-            localStorage.setItem('dpwi_session', JSON.stringify(user));
-            loginSuccess();
-        } else {
-            showToast("Invalid Credentials. Please try again.", "var(--rejected)");
-        }
-    };
-
-    document.getElementById('reg-form').onsubmit = (e) => {
-        e.preventDefault();
-        const email = document.getElementById('reg-email').value;
-        if (!email.endsWith('@fsworks.gov.za') && email !== 'darlington1717@gmail.com') {
-            return showToast("Please use an official @fsworks.gov.za email.", "var(--rejected)");
-        }
-        if (document.getElementById('reg-pass').value !== document.getElementById('reg-confirm').value) {
-            return showToast("Passwords do not match.", "var(--rejected)");
-        }
-
-        const newUser = {
-            name: document.getElementById('reg-name').value,
-            email: email,
-            password: document.getElementById('reg-pass').value,
-            role: document.getElementById('reg-role').value
-        };
-        users.push(newUser);
-        localStorage.setItem('dpwi_users', JSON.stringify(users));
-        showToast("Account Created Successfully!", "var(--approved)");
-        toggleAuth('login');
-    };
-
-    function loginSuccess() {
-        document.getElementById('auth-page').classList.add('hidden');
-        document.getElementById('user-fullname-display').innerText = currentUser.name;
-        document.getElementById('user-initials-display').innerText = currentUser.name.split(' ').map(n => n[0]).join('');
-        
-        if (currentUser.role !== 'Employee') {
-            document.getElementById('manager-nav').classList.remove('hidden');
-        }
-        showView('dash');
+    /* =========================================
+       PAGE 1: LOGIN / REGISTER
+       ========================================= */
+    #auth-page {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; align-items: center; justify-content: center; z-index: 2000;
+    }
+    
+    .auth-container { 
+        width: 100%; max-width: 500px; background: rgba(255, 255, 255, 0.98); border-radius: 12px; 
+        box-shadow: 0 25px 60px rgba(0,0,0,0.6); overflow: hidden; 
+        animation: fadeIn 0.6s ease-out;
+        backdrop-filter: blur(5px);
     }
 
-    function logout() {
-        localStorage.removeItem('dpwi_session');
-        location.reload();
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .auth-header { padding: 40px 30px; text-align: center; background: white; border-bottom: 2px solid var(--gold-official); }
+    .auth-header img { width: 100%; max-width: 320px; height: auto; object-fit: contain; }
+    
+    .auth-tabs { display: flex; background: #f1f1f1; }
+    .tab-btn { flex: 1; padding: 18px; border: none; background: transparent; cursor: pointer; font-weight: 700; color: #666; transition: 0.3s; }
+    .tab-btn.active { background: white; color: var(--primary-green); border-bottom: 4px solid var(--gold-official); }
+    
+    .auth-body { padding: 35px; }
+    .form-group { margin-bottom: 22px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.8rem; color: #444; text-transform: uppercase; }
+    .form-group input, .form-group select { width: 100%; padding: 14px 15px; border: 1px solid #ccc; border-radius: 5px; outline: none; font-size: 1rem; }
+    .form-group input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 4px rgba(27, 94, 32, 0.2); }
+
+    /* =========================================
+       SIDEBAR (SOUTH AFRICAN GREEN)
+       ========================================= */
+    #top-accent-border { height: 6px; background: var(--gold-official); width: 100%; position: fixed; top: 0; left: 0; z-index: 1100; }
+    
+    #sidebar {
+        width: var(--sidebar-width); background: rgba(14, 52, 16, 0.95); color: white; height: 100vh;
+        position: fixed; left: 0; top: 0; z-index: 1000; transition: 0.3s ease; display: flex; flex-direction: column;
+        box-shadow: 5px 0 20px rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
     }
+    .sidebar-logo-area { padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); background: white; }
+    .sidebar-logo-area img { width: 100%; }
 
-    // =========================================
-    // UI & NAVIGATION
-    // =========================================
-    function showView(viewId) {
-        document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
-        document.getElementById(`view-${viewId}`).classList.remove('hidden');
-        
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        if(document.getElementById(`nav-${viewId}`)) document.getElementById(`nav-${viewId}`).classList.add('active');
-
-        if (viewId === 'dash') renderDashboard();
-        if (viewId === 'history') renderHistory();
-        if (viewId === 'mgr') renderManagerQueue();
-        if (viewId === 'apply') {
-            document.getElementById('f-date-now').value = new Date().toLocaleDateString();
-        }
-
-        if (window.innerWidth < 992) toggleSidebar(false);
-    }
-
-    function toggleSidebar(force) {
-        const side = document.getElementById('sidebar');
-        if (force !== undefined) side.classList.toggle('open', force);
-        else side.classList.toggle('open');
-    }
-
-    function showToast(msg, color = "var(--primary-green)") {
-        const t = document.getElementById('toast');
-        t.innerText = msg;
-        t.style.background = color;
-        t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, 4000);
-    }
-
-    // =========================================
-    // LEAVE LOGIC
-    // =========================================
-    function submitNewApplication() {
-        const surname = document.getElementById('f-surname').value;
-        const days = document.getElementById('f-days').value;
-        const sig = document.getElementById('f-sig').value;
-
-        if (!surname || !days || !sig) {
-            return showToast("Please fill in all required fields (*).", "var(--rejected)");
-        }
-
-        const app = {
-            id: 'FS' + Math.floor(100000 + Math.random() * 900000),
-            applicant: currentUser.name,
-            email: currentUser.email,
-            type: document.getElementById('f-type').value,
-            days: days,
-            start: document.getElementById('f-start').value,
-            end: document.getElementById('f-end').value,
-            status: 'Pending',
-            date: new Date().toLocaleDateString()
-        };
-
-        apps.push(app);
-        localStorage.setItem('dpwi_apps', JSON.stringify(apps));
-        showToast("Application Submitted Successfully!", "var(--approved)");
-        showView('dash');
-    }
-
-    function renderDashboard() {
-        const my = apps.filter(x => x.email === currentUser.email);
-        document.getElementById('stat-val-total').innerText = my.length;
-        document.getElementById('stat-val-pending').innerText = my.filter(x => x.status === 'Pending').length;
-        document.getElementById('stat-val-approved').innerText = my.filter(x => x.status === 'Approved').length;
-        document.getElementById('stat-val-rejected').innerText = my.filter(x => x.status === 'Rejected').length;
-
-        const tbody = document.querySelector('#table-recent tbody');
-        const recent = my.slice(-5).reverse();
-        tbody.innerHTML = recent.map(a => `
-            <tr>
-                <td>${a.date}</td>
-                <td>${a.type}</td>
-                <td>${a.start}</td>
-                <td>${a.days}</td>
-                <td><span class="status-pill bg-${a.status.toLowerCase()}">${a.status}</span></td>
-            </tr>
-        `).join('') || '<tr><td colspan="5" style="text-align:center; padding: 20px;">No recent activity found.</td></tr>';
-    }
-
-    function renderHistory() {
-        const my = apps.filter(x => x.email === currentUser.email).reverse();
-        const tbody = document.querySelector('#table-history-full tbody');
-        tbody.innerHTML = my.map(a => `
-            <tr>
-                <td><strong>${a.id}</strong></td>
-                <td>${a.date}</td>
-                <td>${a.type}</td>
-                <td>${a.start} to ${a.end}</td>
-                <td>${a.days}</td>
-                <td><span class="status-pill bg-${a.status.toLowerCase()}">${a.status}</span></td>
-                <td><button class="btn btn-gold" style="padding: 5px 10px; font-size: 0.7rem;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button></td>
-            </tr>
-        `).join('');
-    }
-
-    function renderManagerQueue() {
-        const pending = apps.filter(x => x.status === 'Pending');
-        const tbody = document.querySelector('#table-manager-queue tbody');
-        tbody.innerHTML = pending.map(a => `
-            <tr>
-                <td><strong>${a.applicant}</strong><br><small>${a.email}</small></td>
-                <td>${a.type}</td>
-                <td>${a.start} to ${a.end}</td>
-                <td>${a.days}</td>
-                <td>${a.date}</td>
-                <td style="display: flex; gap: 8px;">
-                    <button class="btn btn-submit" style="padding: 6px 12px; font-size: 0.7rem;" onclick="processRequest('${a.id}', 'Approved')">Approve</button>
-                    <button class="btn" style="padding: 6px 12px; font-size: 0.7rem; background: var(--rejected); color: white;" onclick="processRequest('${a.id}', 'Rejected')">Reject</button>
-                </td>
-            </tr>
-        `).join('') || '<tr><td colspan="6" style="text-align:center; padding: 30px;">No pending requests found.</td></tr>';
-    }
-
-    function processRequest(id, status) {
-        const idx = apps.findIndex(a => a.id === id);
-        if (idx !== -1) {
-            apps[idx].status = status;
-            localStorage.setItem('dpwi_apps', JSON.stringify(apps));
-            showToast(`Application #${id} has been ${status}.`, "var(--approved)");
-            renderManagerQueue();
-        }
-    }
-
-    // Initialize on Load
-    window.onload = () => {
-        if (currentUser) loginSuccess();
-    };
-
-</script>
+    .nav-menu { flex: 1; padding: 25px 0; }
+    .nav-i

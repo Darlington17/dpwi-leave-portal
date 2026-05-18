@@ -10,111 +10,154 @@
         --pending: #f39c12;
         --approved: #27ae60;
         --rejected: #c0392b;
+        --logo-url: url('https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png');
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-    body { background-color: #f0f2f0; color: #333; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    body { background-color: #f2f4f2; color: #333; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
     .hidden { display: none !important; }
 
-    /* LOGIN PAGE */
+    /* =========================================
+       PAGE 1: LOGIN / REGISTER (WITH LOGO BG)
+       ========================================= */
     #auth-page {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        /* Using the provided logo as a background pattern/overlay */
-        background: linear-gradient(rgba(27, 94, 32, 0.92), rgba(10, 46, 12, 0.95)), 
-                    url('https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png');
-        background-size: cover;
+        /* Background uses a dark green gradient overlay on the provided logo */
+        background: linear-gradient(rgba(27, 94, 32, 0.94), rgba(10, 46, 12, 0.96)), 
+                    var(--logo-url);
+        background-size: 600px;
         background-position: center;
         display: flex; align-items: center; justify-content: center; z-index: 2000;
     }
+    
     .auth-container { 
         width: 100%; max-width: 500px; background: white; border-radius: 12px; 
-        box-shadow: 0 20px 50px rgba(0,0,0,0.4); overflow: hidden; padding-bottom: 20px; 
+        box-shadow: 0 25px 60px rgba(0,0,0,0.5); overflow: hidden; 
+        animation: fadeIn 0.5s ease-out;
     }
-    .auth-header { padding: 30px; text-align: center; background: white; }
-    .auth-header img { height: 90px; object-fit: contain; margin-bottom: 10px; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .auth-header { padding: 40px 30px; text-align: center; background: white; border-bottom: 1px solid #eee; }
+    .auth-header img { width: 100%; max-width: 380px; height: auto; object-fit: contain; }
     
-    .auth-tabs { display: flex; border-bottom: 2px solid #eee; }
-    .tab-btn { flex: 1; padding: 15px; border: none; background: #f9f9f9; cursor: pointer; font-weight: 700; color: #888; transition: 0.3s; }
+    .auth-tabs { display: flex; background: #f9f9f9; }
+    .tab-btn { flex: 1; padding: 18px; border: none; background: transparent; cursor: pointer; font-weight: 700; color: #888; transition: 0.3s; border-bottom: 3px solid transparent; }
     .tab-btn.active { background: white; color: var(--primary-green); border-bottom: 3px solid var(--gold-official); }
     
-    .auth-body { padding: 30px; }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; color: #555; }
-    .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
-    .form-group input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1); }
+    .auth-body { padding: 35px; }
+    .form-group { margin-bottom: 22px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.8rem; color: #555; text-transform: uppercase; }
+    .form-group input, .form-group select { width: 100%; padding: 14px 15px; border: 1px solid #ddd; border-radius: 5px; outline: none; font-size: 1rem; }
+    .form-group input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 4px rgba(27, 94, 32, 0.1); }
 
-    /* LAYOUT & SIDEBAR */
-    #top-accent-border { height: 4px; background: var(--gold-official); width: 100%; position: fixed; top: 0; left: 0; z-index: 1100; }
+    /* =========================================
+       SIDEBAR (DARK GREEN)
+       ========================================= */
+    #top-accent-border { height: 5px; background: var(--gold-official); width: 100%; position: fixed; top: 0; left: 0; z-index: 1100; }
     
     #sidebar {
         width: var(--sidebar-width); background: var(--primary-green); color: white; height: 100vh;
         position: fixed; left: 0; top: 0; z-index: 1000; transition: 0.3s ease; display: flex; flex-direction: column;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
     }
     .sidebar-logo-area { padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .sidebar-logo-area img { height: 60px; filter: brightness(0) invert(1); } /* White version for sidebar */
+    .sidebar-logo-area img { width: 100%; filter: brightness(0) invert(1); }
 
-    .nav-menu { flex: 1; padding: 20px 0; }
+    .nav-menu { flex: 1; padding: 25px 0; }
     .nav-item {
-        padding: 14px 25px; display: flex; align-items: center; gap: 15px; color: #e0e0e0;
-        text-decoration: none; cursor: pointer; transition: 0.2s; font-size: 0.95rem;
+        padding: 16px 25px; display: flex; align-items: center; gap: 15px; color: #d1d1d1;
+        text-decoration: none; cursor: pointer; transition: 0.2s; font-size: 0.95rem; border-left: 4px solid transparent;
     }
-    .nav-item i { color: var(--light-gold); width: 20px; text-align: center; }
-    .nav-item:hover { background: rgba(255,255,255,0.05); }
-    .nav-item.active { background: var(--gold-official); color: white; font-weight: 700; }
+    .nav-item i { color: var(--light-gold); width: 22px; text-align: center; font-size: 1.1rem; }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { background: var(--gold-official); color: white; border-left: 4px solid var(--light-gold); font-weight: 700; }
 
     .btn-sidebar-apply {
-        background: var(--light-gold); color: var(--primary-green); margin: 15px 20px;
-        padding: 12px; border-radius: 4px; font-weight: 900; text-align: center;
+        background: var(--light-gold); color: var(--primary-green); margin: 20px;
+        padding: 14px; border-radius: 4px; font-weight: 900; text-align: center;
         text-transform: uppercase; border: none; cursor: pointer; width: calc(100% - 40px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s;
     }
+    .btn-sidebar-apply:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
-    #main-wrapper { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    #main-wrapper { margin-left: var(--sidebar-width); flex: 1; display: flex; flex-direction: column; min-height: 100vh; transition: 0.3s; }
 
-    /* HEADER */
+    /* =========================================
+       HEADER
+       ========================================= */
     header.app-header {
-        background: white; padding: 10px 30px; display: flex; justify-content: space-between;
-        align-items: center; border-bottom: 1px solid var(--border-grey); border-left: 6px solid var(--gold-official);
-        position: sticky; top: 4px; z-index: 900;
+        background: white; padding: 12px 35px; display: flex; justify-content: space-between;
+        align-items: center; border-bottom: 1px solid var(--border-grey); border-left: 8px solid var(--gold-official);
+        position: sticky; top: 5px; z-index: 900; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
-    .header-logo img { height: 60px; }
-    .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--primary-green); }
+    .header-logo img { height: 70px; width: auto; }
+    .hamburger { display: none; font-size: 1.6rem; cursor: pointer; color: var(--primary-green); }
 
-    .user-profile { display: flex; align-items: center; gap: 12px; }
-    .avatar {
-        width: 40px; height: 40px; background: var(--primary-green); color: var(--light-gold);
+    .user-profile { display: flex; align-items: center; gap: 15px; }
+    .user-name-tag { font-weight: 700; font-size: 0.9rem; color: #444; }
+    .avatar-circle {
+        width: 42px; height: 42px; background: var(--primary-green); color: var(--light-gold);
         border-radius: 50%; display: flex; align-items: center; justify-content: center;
         font-weight: 700; border: 2px solid var(--gold-official);
     }
 
-    /* STAT CARDS */
+    /* =========================================
+       DASHBOARD CARDS
+       ========================================= */
     .view-container { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 40px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; margin-bottom: 40px; }
     .stat-card {
-        background: white; padding: 25px; border-radius: 8px; display: flex; align-items: center;
-        justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee;
+        background: white; padding: 30px; border-radius: 8px; display: flex; align-items: center;
+        justify-content: space-between; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee;
+        transition: 0.3s;
     }
-    .stat-value { font-size: 48px; font-weight: 900; display: block; margin-top: 5px; }
-    .stat-label { font-size: 0.85rem; color: #777; font-weight: 700; text-transform: uppercase; }
-    .stat-icon { font-size: 3rem; }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-value { font-size: 52px; font-weight: 900; display: block; line-height: 1.1; }
+    .stat-label { font-size: 0.85rem; color: #777; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-icon-xl { font-size: 3.5rem; }
 
-    /* TABLES */
-    .card { background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 30px; }
+    /* =========================================
+       TABLES
+       ========================================= */
+    .card { background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 35px; border: 1px solid #eee; }
+    .card-title-bar { padding: 20px 25px; background: #fafafa; border-bottom: 1px solid #eee; font-weight: 900; color: var(--primary-green); text-transform: uppercase; font-size: 0.9rem; }
+    
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: var(--primary-green); color: white; }
-    th { padding: 15px 20px; text-align: left; font-size: 0.85rem; text-transform: uppercase; }
-    td { padding: 15px 20px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+    th { padding: 18px 25px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+    td { padding: 18px 25px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
     tbody tr:nth-child(even) { background-color: var(--off-white); }
     tbody tr:hover { background-color: #f0f4f0; }
 
-    /* BUTTONS */
-    .btn { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: 700; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; justify-content: center; }
-    .btn-submit { background: var(--primary-green); color: white; width: 100%; }
-    .btn-download { background: var(--gold-official); color: white; width: 100%; }
-    .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .status-pill { padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: white; display: inline-block; }
 
-    /* FOOTER */
-    footer { background: var(--primary-green); color: white; padding: 20px; text-align: center; font-size: 0.85rem; border-top: 4px solid var(--gold-official); margin-top: auto; }
+    /* =========================================
+       BUTTONS & FOOTER
+       ========================================= */
+    .btn { padding: 14px 28px; border: none; border-radius: 4px; cursor: pointer; font-weight: 900; transition: 0.3s; display: inline-flex; align-items: center; gap: 12px; justify-content: center; text-transform: uppercase; font-size: 0.85rem; }
+    .btn-submit { background: var(--primary-green); color: white; width: 100%; }
+    .btn-gold { background: var(--gold-official); color: white; width: 100%; }
+    .btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+    footer { background: var(--primary-green); color: white; padding: 25px; text-align: center; font-size: 0.85rem; border-top: 5px solid var(--gold-official); margin-top: auto; }
+
+    /* =========================================
+       OFFICIAL LEAVE FORM
+       ========================================= */
+    .official-form { background: white; padding: 60px; max-width: 1000px; margin: 0 auto; border: 1px solid #000; position: relative; }
+    .form-header-box { text-align: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+    .form-header-box img { height: 100px; margin-bottom: 15px; }
+    .form-header-box h2 { text-transform: uppercase; font-size: 1.6rem; letter-spacing: 1px; }
+    .section-divider { background: #333; color: white; padding: 10px 15px; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; margin: 30px 0 20px 0; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+    .sig-box { border: 1px solid #000; padding: 20px; margin-top: 30px; font-style: italic; }
+
+    /* TOAST */
+    #toast { position: fixed; bottom: 40px; right: 40px; padding: 20px 30px; border-radius: 6px; color: white; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 5000; display: none; animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
     /* MOBILE */
     @media (max-width: 992px) {
@@ -122,54 +165,68 @@
         #sidebar.open { transform: translateX(0); }
         #main-wrapper { margin-left: 0; }
         .hamburger { display: block; }
+        .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+        .stats-grid { grid-template-columns: 1fr; }
+        .official-form { padding: 20px; }
+        .form-grid { grid-template-columns: 1fr; }
     }
 
     /* PRINT */
     @media print {
-        #sidebar, header, footer, .no-print { display: none !important; }
-        #main-wrapper { margin-left: 0; }
+        #sidebar, header, footer, .no-print, #toast, #top-accent-border { display: none !important; }
+        body { background: white; }
+        #main-wrapper { margin: 0; }
         .view-container { padding: 0; }
-        .official-form { border: 1px solid #000; padding: 20px; }
+        .official-form { border: none; width: 100%; }
     }
 </style>
 
 <div id="top-accent-border"></div>
 
-<!-- AUTH PAGE -->
+<!-- PAGE 1: LOGIN / REGISTER -->
 <div id="auth-page">
     <div class="auth-container">
         <div class="auth-header">
-            <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="DPWI Logo">
+            <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="Department Logo">
         </div>
         <div class="auth-tabs">
-            <button class="tab-btn active" id="btn-tab-login" onclick="switchAuth('login')">LOGIN</button>
-            <button class="tab-btn" id="btn-tab-register" onclick="switchAuth('register')">REGISTER</button>
+            <button class="tab-btn active" id="tab-login-btn" onclick="toggleAuth('login')">LOGIN</button>
+            <button class="tab-btn" id="tab-reg-btn" onclick="toggleAuth('register')">REGISTER</button>
         </div>
         <div class="auth-body">
+            <!-- Login -->
             <form id="login-form">
                 <div class="form-group">
-                    <label>OFFICIAL EMAIL ADDRESS</label>
+                    <label>Official Email (@fsworks.gov.za)</label>
                     <input type="email" id="login-email" placeholder="name@fsworks.gov.za" required>
                 </div>
                 <div class="form-group">
-                    <label>PASSWORD</label>
+                    <label>Password</label>
                     <input type="password" id="login-password" required>
                 </div>
-                <button type="submit" class="btn btn-submit">SIGN IN TO PORTAL</button>
+                <button type="submit" class="btn btn-submit">Sign Into Secure Portal</button>
+                <p style="text-align: center; margin-top: 20px; font-weight: 700; font-size: 0.8rem; color: var(--gold-official); cursor: pointer;">FORGOT YOUR PASSWORD?</p>
             </form>
 
-            <form id="register-form" class="hidden">
-                <div class="form-group"><label>FULL NAME</label><input type="text" id="reg-name" required></div>
-                <div class="form-group"><label>OFFICIAL EMAIL</label><input type="email" id="reg-email" required></div>
+            <!-- Register -->
+            <form id="reg-form" class="hidden">
+                <div class="form-group"><label>Full Legal Name</label><input type="text" id="reg-name" required></div>
+                <div class="form-group"><label>Work Email</label><input type="email" id="reg-email" placeholder="name@fsworks.gov.za" required></div>
                 <div class="form-group">
-                    <label>ROLE</label>
+                    <label>Assigned Role</label>
                     <select id="reg-role">
                         <option value="Employee">Employee</option>
-                        <option value="Manager">Manager</option>
+                        <option value="Manager">Manager / Supervisor</option>
+                        <option value="HR Admin">HR Administrator</option>
                     </select>
                 </div>
-                <div class="form-group"><label>PASSWORD</label><input type="password" id="reg-pass" required></div>
-                <button type="submit" class="btn btn-submit">CREATE ACCOUNT</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group"><label>Password</label><input type="password" id="reg-pass" required></div>
+                    <div class="form-group"><label>Confirm</label><input type="password" id="reg-confirm" required></div>
+                </div>
+                <button type="submit" class="btn btn-gold">Create Official Account</button>
             </form>
         </div>
     </div>
@@ -179,27 +236,27 @@
 <aside id="sidebar">
     <div class="sidebar-logo-area">
         <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="Logo">
-        <p style="color: var(--light-gold); font-weight: 900; font-size: 0.7rem; margin-top: 10px;">FREE STATE PROVINCE</p>
+        <div style="color: var(--light-gold); font-weight: 900; margin-top: 15px; font-size: 0.75rem; letter-spacing: 1px;">FREE STATE PROVINCE</div>
     </div>
     <button class="btn-sidebar-apply" onclick="showView('apply')">
-        <i class="fa-solid fa-file-circle-plus"></i> Apply for Leave
+        <i class="fa-solid fa-plus-circle"></i> Apply for Leave
     </button>
     <nav class="nav-menu">
         <a class="nav-item active" id="nav-dash" onclick="showView('dash')">
-            <i class="fa-solid fa-chart-line"></i> <span>My Dashboard</span>
+            <i class="fa-solid fa-house-chimney"></i> <span>My Dashboard</span>
         </a>
         <a class="nav-item" id="nav-history" onclick="showView('history')">
-            <i class="fa-solid fa-clock-rotate-left"></i> <span>My Applications</span>
+            <i class="fa-solid fa-list-check"></i> <span>Application History</span>
         </a>
-        <div id="mgr-nav" class="hidden">
-            <p style="padding: 20px 25px 10px; font-size: 0.7rem; opacity: 0.5; font-weight: 900;">MANAGEMENT</p>
+        <div id="manager-nav" class="hidden">
+            <p style="padding: 25px 25px 10px; font-size: 0.7rem; opacity: 0.5; font-weight: 900; color: white; text-transform: uppercase;">Management</p>
             <a class="nav-item" id="nav-mgr" onclick="showView('mgr')">
-                <i class="fa-solid fa-users-viewfinder"></i> <span>Team Requests</span>
+                <i class="fa-solid fa-user-gear"></i> <span>Review Team Requests</span>
             </a>
         </div>
     </nav>
-    <a class="nav-item" onclick="logout()" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);">
-        <i class="fa-solid fa-power-off"></i> <span>Logout</span>
+    <a class="nav-item" onclick="logout()" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); color: var(--light-gold);">
+        <i class="fa-solid fa-power-off"></i> <span>Logout Session</span>
     </a>
 </aside>
 
@@ -213,94 +270,154 @@
             </div>
         </div>
         <div class="user-profile">
-            <span id="user-full-name" style="font-weight: 700; font-size: 0.9rem;">...</span>
-            <div class="avatar" id="user-initials">--</div>
+            <div class="user-name-tag" id="user-fullname-display">Full Name</div>
+            <div class="avatar-circle" id="user-initials-display">??</div>
         </div>
     </header>
 
     <div class="view-container">
+        
         <!-- DASHBOARD -->
         <section id="view-dash" class="view-content">
-            <h2 style="margin-bottom: 30px; font-weight: 900; color: var(--primary-green);">Leave Dashboard</h2>
+            <h2 style="margin-bottom: 35px; font-weight: 900; color: var(--primary-green); border-bottom: 3px solid var(--gold-official); display: inline-block; padding-bottom: 5px;">Portal Overview</h2>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div><span class="stat-label">Total Applied</span><span class="stat-value" id="s-total" style="color: var(--primary-green);">0</span></div>
-                    <i class="fa-solid fa-file-alt stat-icon" style="color: var(--primary-green);"></i>
+                    <div><span class="stat-label">Total Applied</span><span class="stat-value" id="stat-val-total" style="color: var(--primary-green);">0</span></div>
+                    <i class="fa-solid fa-file-invoice stat-icon-xl" style="color: var(--primary-green);"></i>
                 </div>
                 <div class="stat-card">
-                    <div><span class="stat-label">Pending</span><span class="stat-value" id="s-pending" style="color: var(--pending);">0</span></div>
-                    <i class="fa-solid fa-clock stat-icon" style="color: var(--pending);"></i>
+                    <div><span class="stat-label">Pending</span><span class="stat-value" id="stat-val-pending" style="color: var(--pending);">0</span></div>
+                    <i class="fa-solid fa-hourglass-half stat-icon-xl" style="color: var(--pending);"></i>
                 </div>
                 <div class="stat-card">
-                    <div><span class="stat-label">Approved</span><span class="stat-value" id="s-approved" style="color: var(--approved);">0</span></div>
-                    <i class="fa-solid fa-check-circle stat-icon" style="color: var(--approved);"></i>
+                    <div><span class="stat-label">Approved</span><span class="stat-value" id="stat-val-approved" style="color: var(--approved);">0</span></div>
+                    <i class="fa-solid fa-circle-check stat-icon-xl" style="color: var(--approved);"></i>
                 </div>
                 <div class="stat-card">
-                    <div><span class="stat-label">Rejected</span><span class="stat-value" id="s-rejected" style="color: var(--rejected);">0</span></div>
-                    <i class="fa-solid fa-times-circle stat-icon" style="color: var(--rejected);"></i>
+                    <div><span class="stat-label">Rejected</span><span class="stat-value" id="stat-val-rejected" style="color: var(--rejected);">0</span></div>
+                    <i class="fa-solid fa-circle-xmark stat-icon-xl" style="color: var(--rejected);"></i>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title-bar">Recent Applications</div>
+                <div style="overflow-x: auto;">
+                    <table id="table-recent">
+                        <thead>
+                            <tr>
+                                <th>Date Applied</th>
+                                <th>Leave Type</th>
+                                <th>Start Date</th>
+                                <th>Days</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- APPLICATION HISTORY -->
+        <section id="view-history" class="view-content hidden">
+            <h2 style="margin-bottom: 30px; font-weight: 900; color: var(--primary-green);">My Application History</h2>
+            <div class="card">
+                <div style="overflow-x: auto;">
+                    <table id="table-history-full">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Applied On</th>
+                                <th>Type</th>
+                                <th>Period</th>
+                                <th>Days</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </section>
 
         <!-- APPLY FORM -->
         <section id="view-apply" class="view-content hidden">
-            <div class="card no-print" style="padding: 30px;">
-                <h2 style="margin-bottom: 20px;">Application for Leave of Absence</h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="form-group"><label>Surname</label><input type="text" id="f-surname"></div>
-                    <div class="form-group"><label>PERSAL No.</label><input type="text" id="f-persal"></div>
+            <div class="no-print" style="margin-bottom: 30px; display: flex; gap: 15px;">
+                <button class="btn btn-submit" onclick="submitNewApplication()" style="flex: 1;"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
+                <button class="btn btn-gold" onclick="window.print()" style="flex: 1;"><i class="fa-solid fa-file-pdf"></i> Download as PDF</button>
+            </div>
+
+            <div class="official-form">
+                <div class="form-header-box">
+                    <img src="https://i.ibb.co/XW3sK0C/dpwi-logo-wide.png" alt="Logo">
+                    <h2>Application for Leave of Absence</h2>
+                    <p style="font-weight: bold; margin-top: 10px;">DEPARTMENT OF PUBLIC WORKS AND INFRASTRUCTURE - FREE STATE PROVINCE</p>
+                </div>
+
+                <div class="section-divider">1. Personal Information</div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Surname *</label><input type="text" id="f-surname" required></div>
+                    <div class="form-group"><label>Initials *</label><input type="text" id="f-initials" required></div>
+                    <div class="form-group"><label>PERSAL Number *</label><input type="text" id="f-persal" required></div>
+                    <div class="form-group"><label>Contact Number</label><input type="text" id="f-tel"></div>
+                </div>
+
+                <div class="section-divider">2. Leave Details</div>
+                <div class="form-grid">
                     <div class="form-group">
-                        <label>Leave Type</label>
+                        <label>Type of Leave Applied For *</label>
                         <select id="f-type">
-                            <option>Annual Leave</option>
-                            <option>Sick Leave</option>
-                            <option>Family Responsibility</option>
+                            <option value="Annual Leave">Annual Leave</option>
+                            <option value="Normal Sick Leave">Normal Sick Leave</option>
+                            <option value="Family Responsibility">Family Responsibility Leave</option>
+                            <option value="Maternity Leave">Maternity Leave</option>
+                            <option value="Paternity Leave">Paternity Leave</option>
+                            <option value="Special Leave">Special Leave</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Working Days</label><input type="number" id="f-days"></div>
-                    <div class="form-group"><label>Start Date</label><input type="date" id="f-start"></div>
-                    <div class="form-group"><label>End Date</label><input type="date" id="f-end"></div>
+                    <div class="form-group"><label>No. of Working Days *</label><input type="number" id="f-days" required></div>
+                    <div class="form-group"><label>Start Date *</label><input type="date" id="f-start" required></div>
+                    <div class="form-group"><label>End Date *</label><input type="date" id="f-end" required></div>
                 </div>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button class="btn btn-submit" onclick="submitApp()">SUBMIT APPLICATION</button>
-                    <button class="btn btn-download" onclick="window.print()">DOWNLOAD PDF</button>
+
+                <div class="section-divider">3. Certification & Signatures</div>
+                <div class="sig-box">
+                    I hereby certify that I have acquainted myself with my available leave credits and with the rules governing the leave I have applied for. Further, I am certifying that the information provided is correct. Any falsification of information in this regard may form ground for disciplinary action.
+                </div>
+                <div class="form-grid" style="margin-top: 25px;">
+                    <div class="form-group"><label>Digital Signature (Full Name) *</label><input type="text" id="f-sig" placeholder="Type name to sign"></div>
+                    <div class="form-group"><label>Date</label><input type="text" id="f-date-now" readonly></div>
+                </div>
+
+                <div style="margin-top: 50px; text-align: right; border-top: 1px solid #000; padding-top: 10px;">
+                    <p style="font-weight: 900; font-size: 0.7rem;">REPUBLIC OF SOUTH AFRICA</p>
                 </div>
             </div>
         </section>
 
-        <!-- HISTORY -->
-        <section id="view-history" class="view-content hidden">
-            <div class="card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date Applied</th>
-                            <th>Type</th>
-                            <th>Duration</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-tbody"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- MANAGER -->
+        <!-- MANAGER VIEW -->
         <section id="view-mgr" class="view-content hidden">
+            <h2 style="margin-bottom: 30px; font-weight: 900; color: var(--primary-green);">Management Review Queue</h2>
             <div class="card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Type</th>
-                            <th>Days</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mgr-tbody"></tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table id="table-manager-queue">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Leave Type</th>
+                                <th>Period</th>
+                                <th>Days</th>
+                                <th>Applied On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </section>
+
     </div>
 
     <footer>
@@ -308,129 +425,215 @@
     </footer>
 </div>
 
-<script>
-    // CONFIG
-    const EMAIL_CONFIG = { service: 'service_id', template: 'template_id', key: 'public_key' };
+<!-- NOTIFICATION -->
+<div id="toast">Application Submitted!</div>
 
-    // STATE
-    let currentUser = JSON.parse(localStorage.getItem('dpwi_user')) || null;
+<script>
+    // =========================================
+    // APP CONFIG & STATE
+    // =========================================
+    const EMAILJS_PUBLIC_KEY = 'YOUR_KEY';
+    
+    let currentUser = JSON.parse(localStorage.getItem('dpwi_session')) || null;
     let apps = JSON.parse(localStorage.getItem('dpwi_apps')) || [];
     let users = JSON.parse(localStorage.getItem('dpwi_users')) || [
-        { name: 'Darlington Admin', email: 'darlington1717@gmail.com', password: '123', role: 'Manager' }
+        { name: 'Darlington Test', email: 'darlington1717@gmail.com', password: '123', role: 'Manager' }
     ];
 
-    // UI HELPERS
-    function showView(view) {
-        document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
-        document.getElementById('view-' + view).classList.remove('hidden');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        if(document.getElementById('nav-' + view)) document.getElementById('nav-' + view).classList.add('active');
-        
-        if(view === 'dash') renderStats();
-        if(view === 'history') renderHistory();
-        if(view === 'mgr') renderManager();
-        if(window.innerWidth < 992) toggleSidebar(false);
-    }
-
-    function toggleSidebar(force) {
-        document.getElementById('sidebar').classList.toggle('open', force);
-    }
-
-    function switchAuth(mode) {
+    // =========================================
+    // AUTHENTICATION LOGIC
+    // =========================================
+    function toggleAuth(mode) {
         document.getElementById('login-form').classList.toggle('hidden', mode === 'register');
-        document.getElementById('register-form').classList.toggle('hidden', mode === 'login');
-        document.getElementById('btn-tab-login').classList.toggle('active', mode === 'login');
-        document.getElementById('btn-tab-register').classList.toggle('active', mode === 'register');
+        document.getElementById('reg-form').classList.toggle('hidden', mode === 'login');
+        document.getElementById('tab-login-btn').classList.toggle('active', mode === 'login');
+        document.getElementById('tab-reg-btn').classList.toggle('active', mode === 'register');
     }
 
-    // AUTH
     document.getElementById('login-form').onsubmit = (e) => {
         e.preventDefault();
-        const u = users.find(x => x.email === document.getElementById('login-email').value && x.password === document.getElementById('login-password').value);
-        if(u) login(u); else alert("Invalid Credentials");
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-password').value;
+        const user = users.find(u => u.email === email && u.password === pass);
+
+        if (user) {
+            currentUser = user;
+            localStorage.setItem('dpwi_session', JSON.stringify(user));
+            loginSuccess();
+        } else {
+            showToast("Invalid Credentials. Please try again.", "var(--rejected)");
+        }
     };
 
-    document.getElementById('register-form').onsubmit = (e) => {
+    document.getElementById('reg-form').onsubmit = (e) => {
         e.preventDefault();
-        const u = { 
-            name: document.getElementById('reg-name').value, 
-            email: document.getElementById('reg-email').value, 
+        const email = document.getElementById('reg-email').value;
+        if (!email.endsWith('@fsworks.gov.za') && email !== 'darlington1717@gmail.com') {
+            return showToast("Please use an official @fsworks.gov.za email.", "var(--rejected)");
+        }
+        if (document.getElementById('reg-pass').value !== document.getElementById('reg-confirm').value) {
+            return showToast("Passwords do not match.", "var(--rejected)");
+        }
+
+        const newUser = {
+            name: document.getElementById('reg-name').value,
+            email: email,
             password: document.getElementById('reg-pass').value,
-            role: document.getElementById('reg-role').value 
+            role: document.getElementById('reg-role').value
         };
-        users.push(u); localStorage.setItem('dpwi_users', JSON.stringify(users));
-        alert("Registered! Please Login."); switchAuth('login');
+        users.push(newUser);
+        localStorage.setItem('dpwi_users', JSON.stringify(users));
+        showToast("Account Created Successfully!", "var(--approved)");
+        toggleAuth('login');
     };
 
-    function login(user) {
-        currentUser = user;
-        localStorage.setItem('dpwi_user', JSON.stringify(user));
+    function loginSuccess() {
         document.getElementById('auth-page').classList.add('hidden');
-        document.getElementById('user-full-name').innerText = user.name;
-        document.getElementById('user-initials').innerText = user.name.split(' ').map(n => n[0]).join('');
-        if(user.role === 'Manager') document.getElementById('mgr-nav').classList.remove('hidden');
+        document.getElementById('user-fullname-display').innerText = currentUser.name;
+        document.getElementById('user-initials-display').innerText = currentUser.name.split(' ').map(n => n[0]).join('');
+        
+        if (currentUser.role !== 'Employee') {
+            document.getElementById('manager-nav').classList.remove('hidden');
+        }
         showView('dash');
     }
 
-    function logout() { localStorage.removeItem('dpwi_user'); location.reload(); }
+    function logout() {
+        localStorage.removeItem('dpwi_session');
+        location.reload();
+    }
 
-    // CORE
-    function submitApp() {
+    // =========================================
+    // UI & NAVIGATION
+    // =========================================
+    function showView(viewId) {
+        document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+        document.getElementById(`view-${viewId}`).classList.remove('hidden');
+        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        if(document.getElementById(`nav-${viewId}`)) document.getElementById(`nav-${viewId}`).classList.add('active');
+
+        if (viewId === 'dash') renderDashboard();
+        if (viewId === 'history') renderHistory();
+        if (viewId === 'mgr') renderManagerQueue();
+        if (viewId === 'apply') {
+            document.getElementById('f-date-now').value = new Date().toLocaleDateString();
+        }
+
+        if (window.innerWidth < 992) toggleSidebar(false);
+    }
+
+    function toggleSidebar(force) {
+        const side = document.getElementById('sidebar');
+        if (force !== undefined) side.classList.toggle('open', force);
+        else side.classList.toggle('open');
+    }
+
+    function showToast(msg, color = "var(--primary-green)") {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.background = color;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 4000);
+    }
+
+    // =========================================
+    // LEAVE LOGIC
+    // =========================================
+    function submitNewApplication() {
+        const surname = document.getElementById('f-surname').value;
+        const days = document.getElementById('f-days').value;
+        const sig = document.getElementById('f-sig').value;
+
+        if (!surname || !days || !sig) {
+            return showToast("Please fill in all required fields (*).", "var(--rejected)");
+        }
+
         const app = {
-            id: Date.now(),
-            userEmail: currentUser.email,
-            userName: currentUser.name,
+            id: 'FS' + Math.floor(100000 + Math.random() * 900000),
+            applicant: currentUser.name,
+            email: currentUser.email,
             type: document.getElementById('f-type').value,
-            days: document.getElementById('f-days').value,
+            days: days,
             start: document.getElementById('f-start').value,
+            end: document.getElementById('f-end').value,
             status: 'Pending',
             date: new Date().toLocaleDateString()
         };
-        apps.push(app); localStorage.setItem('dpwi_apps', JSON.stringify(apps));
-        alert("Submitted Successfully!"); showView('dash');
+
+        apps.push(app);
+        localStorage.setItem('dpwi_apps', JSON.stringify(apps));
+        showToast("Application Submitted Successfully!", "var(--approved)");
+        showView('dash');
     }
 
-    function renderStats() {
-        const my = apps.filter(x => x.userEmail === currentUser.email);
-        document.getElementById('s-total').innerText = my.length;
-        document.getElementById('s-pending').innerText = my.filter(x => x.status === 'Pending').length;
-        document.getElementById('s-approved').innerText = my.filter(x => x.status === 'Approved').length;
-        document.getElementById('s-rejected').innerText = my.filter(x => x.status === 'Rejected').length;
+    function renderDashboard() {
+        const my = apps.filter(x => x.email === currentUser.email);
+        document.getElementById('stat-val-total').innerText = my.length;
+        document.getElementById('stat-val-pending').innerText = my.filter(x => x.status === 'Pending').length;
+        document.getElementById('stat-val-approved').innerText = my.filter(x => x.status === 'Approved').length;
+        document.getElementById('stat-val-rejected').innerText = my.filter(x => x.status === 'Rejected').length;
+
+        const tbody = document.querySelector('#table-recent tbody');
+        const recent = my.slice(-5).reverse();
+        tbody.innerHTML = recent.map(a => `
+            <tr>
+                <td>${a.date}</td>
+                <td>${a.type}</td>
+                <td>${a.start}</td>
+                <td>${a.days}</td>
+                <td><span class="status-pill bg-${a.status.toLowerCase()}">${a.status}</span></td>
+            </tr>
+        `).join('') || '<tr><td colspan="5" style="text-align:center; padding: 20px;">No recent activity found.</td></tr>';
     }
 
     function renderHistory() {
-        const my = apps.filter(x => x.userEmail === currentUser.email).reverse();
-        document.getElementById('history-tbody').innerHTML = my.map(x => `
+        const my = apps.filter(x => x.email === currentUser.email).reverse();
+        const tbody = document.querySelector('#table-history-full tbody');
+        tbody.innerHTML = my.map(a => `
             <tr>
-                <td>${x.date}</td>
-                <td>${x.type}</td>
-                <td>${x.days} Days (${x.start})</td>
-                <td><b style="color:var(--${x.status.toLowerCase()})">${x.status}</b></td>
+                <td><strong>${a.id}</strong></td>
+                <td>${a.date}</td>
+                <td>${a.type}</td>
+                <td>${a.start} to ${a.end}</td>
+                <td>${a.days}</td>
+                <td><span class="status-pill bg-${a.status.toLowerCase()}">${a.status}</span></td>
+                <td><button class="btn btn-gold" style="padding: 5px 10px; font-size: 0.7rem;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button></td>
             </tr>
         `).join('');
     }
 
-    function renderManager() {
+    function renderManagerQueue() {
         const pending = apps.filter(x => x.status === 'Pending');
-        document.getElementById('mgr-tbody').innerHTML = pending.map(x => `
+        const tbody = document.querySelector('#table-manager-queue tbody');
+        tbody.innerHTML = pending.map(a => `
             <tr>
-                <td>${x.userName}</td>
-                <td>${x.type}</td>
-                <td>${x.days} Days</td>
-                <td>
-                    <button onclick="updateApp(${x.id}, 'Approved')" class="btn" style="background:var(--approved); color:white; padding:5px 10px;">Approve</button>
-                    <button onclick="updateApp(${x.id}, 'Rejected')" class="btn" style="background:var(--rejected); color:white; padding:5px 10px;">Reject</button>
+                <td><strong>${a.applicant}</strong><br><small>${a.email}</small></td>
+                <td>${a.type}</td>
+                <td>${a.start} to ${a.end}</td>
+                <td>${a.days}</td>
+                <td>${a.date}</td>
+                <td style="display: flex; gap: 8px;">
+                    <button class="btn btn-submit" style="padding: 6px 12px; font-size: 0.7rem;" onclick="processRequest('${a.id}', 'Approved')">Approve</button>
+                    <button class="btn" style="padding: 6px 12px; font-size: 0.7rem; background: var(--rejected); color: white;" onclick="processRequest('${a.id}', 'Rejected')">Reject</button>
                 </td>
             </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center; padding:20px;">No pending requests</td></tr>';
+        `).join('') || '<tr><td colspan="6" style="text-align:center; padding: 30px;">No pending requests found.</td></tr>';
     }
 
-    function updateApp(id, status) {
-        const x = apps.find(a => a.id === id);
-        if(x) x.status = status;
-        localStorage.setItem('dpwi_apps', JSON.stringify(apps));
-        renderManager();
+    function processRequest(id, status) {
+        const idx = apps.findIndex(a => a.id === id);
+        if (idx !== -1) {
+            apps[idx].status = status;
+            localStorage.setItem('dpwi_apps', JSON.stringify(apps));
+            showToast(`Application #${id} has been ${status}.`, "var(--approved)");
+            renderManagerQueue();
+        }
     }
 
-    window.onload = () => { if(currentUser) login(currentUser); };
+    // Initialize on Load
+    window.onload = () => {
+        if (currentUser) loginSuccess();
+    };
+
 </script>

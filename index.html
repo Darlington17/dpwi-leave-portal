@@ -452,12 +452,14 @@ td{padding:12px 15px;border-bottom:1px solid #eee;font-size:0.86rem;color:#444;v
 <div id="toasts"></div>
 
 <script>
-const { createClient } = supabase
+console.log('Script running, supabase =', typeof window.supabase)
+const { createClient } = window.supabase
 
 const sb = createClient(
   'https://tlnomboqhglhbyyxdgwo.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsbm9tYm9xaGdsaGJ5eXhkZ3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MzQwNjIsImV4cCI6MjA5NTQxMDA2Mn0.Eo7we1Qz00mNZ8NJmaDc0qzFwFxoY6KxNntdz-bTGJM'
 )
+console.log('Supabase client created:', typeof sb)
 
 const LEAVE_BALANCES = {
   'Annual Leave':15,'Normal Sick Leave':10,'Family Responsibility Leave':3,

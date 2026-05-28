@@ -834,7 +834,18 @@ function updateNotifBadge() {
 }
 
 // ── AUTH STATE LISTENER ───────────────────────────────────────
+// Fallback: if onAuthStateChange never fires, show login after 3s
+setTimeout(() => {
+  const overlay = document.getElementById('loading-overlay')
+  if (!overlay.classList.contains('hidden')) {
+    console.log('Fallback triggered - showing auth page')
+    overlay.classList.add('hidden')
+    document.getElementById('auth-page').classList.remove('hidden')
+  }
+}, 3000)
+
 sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('Auth event:', event, 'session:', !!session)
   if ((event==='SIGNED_IN'||event==='TOKEN_REFRESHED') && session) {
     await initApp(session.user)
     hideLoading()
@@ -847,7 +858,24 @@ sb.auth.onAuthStateChange(async (event, session) => {
     if (!session) {
       document.getElementById('auth-page').classList.remove('hidden')
       hideLoading()
+    } else {
+      await initApp(session.user)
+      hideLoading()
     }
+  }
+})
+
+// Also try getSession directly as backup
+sb.auth.getSession().then(async ({ data: { session } }) => {
+  console.log('getSession result:', !!session)
+  const overlay = document.getElementById('loading-overlay')
+  if (!overlay.classList.contains('hidden')) {
+    if (session) {
+      await initApp(session.user)
+    } else {
+      document.getElementById('auth-page').classList.remove('hidden')
+    }
+    hideLoading()
   }
 })
 </script>

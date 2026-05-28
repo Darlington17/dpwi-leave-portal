@@ -466,6 +466,32 @@ const LEAVE_BALANCES = {
   'Paternity Leave':3,'Adoption Leave':45,'Pre-natal Leave':5
 }
 
+// ── NOTIFY FUNCTION ───────────────────────────────────────────
+async function notifyLeave(applicationId, eventType) {
+  try {
+    const { data: { session } } = await sb.auth.getSession()
+    const res = await fetch(
+      'https://tlnomboqhglhbyyxdgwo.supabase.co/functions/v1/notify-leave',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify({
+          application_id: applicationId,
+          event_type: eventType
+        })
+      }
+    )
+    const result = await res.json()
+    console.log('Notification sent:', eventType, result)
+  } catch(err) {
+    console.error('Notification error:', err)
+    // Don't show error to user - notification failure shouldn't block the action
+  }
+}
+
 let cu = null   // supabase auth user
 let cp = null   // profiles row
 let allApps = []
@@ -656,7 +682,7 @@ window.submitLeave = async () => {
   if (!lt||!sn||!sd||!dy||!sg) return toast('Please complete all required fields (*)', 'error')
   const endD = new Date(sd)
   endD.setDate(endD.getDate() + parseInt(dy) - 1)
-  const { error } = await sb.from('leave_applications').insert({
+  const { data, error } = await sb.from('leave_applications').insert({
     employee_id: cu.id,
     company_id: cp?.company_id || null,
     leave_type: lt.value,
@@ -665,9 +691,11 @@ window.submitLeave = async () => {
     working_days: parseInt(dy),
     reason: document.getElementById('f-addr').value || null,
     status: 'pending'
-  })
+  }).select().single()
   if (error) return toast('Submission failed: ' + error.message, 'error')
   toast('Application submitted successfully!', 'success')
+  // Notify manager by email
+  if (data?.id) await notifyLeave(data.id, 'submitted')
   await loadAllApps()
   showView('my-apps')
 }
@@ -702,6 +730,8 @@ window.setStatus = async (id, status, reason='') => {
   const { error } = await sb.from('leave_applications').update(update).eq('id', id)
   if (error) return toast('Update failed: ' + error.message, 'error')
   toast(`Application ${status}!`, status==='approved' ? 'success' : 'warning')
+  // Notify employee by email
+  await notifyLeave(id, status)
   await loadAllApps()
   renderMgr()
 }

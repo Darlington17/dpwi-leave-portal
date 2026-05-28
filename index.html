@@ -470,25 +470,31 @@ const LEAVE_BALANCES = {
 async function notifyLeave(applicationId, eventType) {
   try {
     const { data: { session } } = await sb.auth.getSession()
+    if (!session) { console.warn('No session for notify'); return }
+    if (!applicationId) { console.warn('No applicationId for notify'); return }
+
+    const payload = JSON.stringify({
+      application_id: applicationId,
+      event_type: eventType
+    })
+    console.log('Calling edge function with:', payload)
+
     const res = await fetch(
       'https://tlnomboqhglhbyyxdgwo.supabase.co/functions/v1/smooth-processor',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + session.access_token
+          'Authorization': 'Bearer ' + session.access_token,
+          'x-client-info': 'hrguard'
         },
-        body: JSON.stringify({
-          application_id: applicationId,
-          event_type: eventType
-        })
+        body: payload
       }
     )
-    const result = await res.json()
-    console.log('Notification sent:', eventType, result)
+    const text = await res.text()
+    console.log('Edge function response:', res.status, text)
   } catch(err) {
     console.error('Notification error:', err)
-    // Don't show error to user - notification failure shouldn't block the action
   }
 }
 

@@ -566,11 +566,31 @@ window.doRegister = async (e) => {
   toast('Account created! Check your email to confirm, then log in.', 'success')
   window.switchAuth('login')
 }
-window.doLogout = async () => { await sb.auth.signOut(); location.reload() }
+window.doLogout = async () => {
+  try {
+    await sb.auth.signOut()
+  } catch(e) {
+    console.log('Logout error:', e)
+  } finally {
+    // Clear everything and reload fresh
+    localStorage.clear()
+    sessionStorage.clear()
+    location.href = location.href.split('?')[0]
+  }
+}
 
 // ── INIT APP ─────────────────────────────────────────────────
 async function initApp(user) {
+  // Reset all state cleanly on every init
   cu = user
+  cp = null
+  allApps = []
+  appInitialised = true
+
+  // Reset UI to clean state
+  document.getElementById('main-app').classList.add('hidden')
+  document.getElementById('auth-page').classList.add('hidden')
+
   // Load or create profile
   let { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single()
   if (!profile) {
@@ -864,50 +884,42 @@ function updateNotifBadge() {
 }
 
 // ── AUTH STATE LISTENER ───────────────────────────────────────
-// Fallback: if onAuthStateChange never fires, show login after 3s
-setTimeout(() => {
-  const overlay = document.getElementById('loading-overlay')
-  if (!overlay.classList.contains('hidden')) {
-    console.log('Fallback triggered - showing auth page')
-    overlay.classList.add('hidden')
+// Single clean auth handler - fixes all session/login/logout issues
+let appInitialised = false
+
+async function bootApp() {
+  try {
+    const { data: { session } } = await sb.auth.getSession()
+    if (session && session.user) {
+      await initApp(session.user)
+    } else {
+      document.getElementById('auth-page').classList.remove('hidden')
+    }
+  } catch(err) {
+    console.error('Boot error:', err)
     document.getElementById('auth-page').classList.remove('hidden')
+  } finally {
+    hideLoading()
   }
-}, 3000)
+}
 
 sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('Auth event:', event, 'session:', !!session)
-  if ((event==='SIGNED_IN'||event==='TOKEN_REFRESHED') && session) {
+  console.log('Auth event:', event)
+  if (event === 'SIGNED_IN' && session && !appInitialised) {
+    appInitialised = true
     await initApp(session.user)
     hideLoading()
-  } else if (event==='SIGNED_OUT') {
-    cu=null; cp=null
+  } else if (event === 'SIGNED_OUT') {
+    appInitialised = false
+    cu = null; cp = null; allApps = []
     document.getElementById('main-app').classList.add('hidden')
     document.getElementById('auth-page').classList.remove('hidden')
     hideLoading()
-  } else if (event==='INITIAL_SESSION') {
-    if (!session) {
-      document.getElementById('auth-page').classList.remove('hidden')
-      hideLoading()
-    } else {
-      await initApp(session.user)
-      hideLoading()
-    }
   }
 })
 
-// Also try getSession directly as backup
-sb.auth.getSession().then(async ({ data: { session } }) => {
-  console.log('getSession result:', !!session)
-  const overlay = document.getElementById('loading-overlay')
-  if (!overlay.classList.contains('hidden')) {
-    if (session) {
-      await initApp(session.user)
-    } else {
-      document.getElementById('auth-page').classList.remove('hidden')
-    }
-    hideLoading()
-  }
-})
+// Boot the app on page load
+bootApp()
 </script>
 </body>
 </html>

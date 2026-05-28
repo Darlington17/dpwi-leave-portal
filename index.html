@@ -452,7 +452,7 @@ td{padding:12px 15px;border-bottom:1px solid #eee;font-size:0.86rem;color:#444;v
 <div id="toasts"></div>
 
 <script type="module">
-import { createClient } from '@supabase/supabase-js'
+const { createClient } = supabase
 
 const sb = createClient(
   'https://tlnomboqhglhbyyxdgwo.supabase.co',

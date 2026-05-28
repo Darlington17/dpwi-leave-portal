@@ -471,7 +471,7 @@ async function notifyLeave(applicationId, eventType) {
   try {
     const { data: { session } } = await sb.auth.getSession()
     const res = await fetch(
-      'https://tlnomboqhglhbyyxdgwo.supabase.co/functions/v1/notify-leave',
+      'https://tlnomboqhglhbyyxdgwo.supabase.co/functions/v1/smooth-processor',
       {
         method: 'POST',
         headers: {

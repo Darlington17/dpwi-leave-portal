@@ -997,327 +997,286 @@ function updateNotifBadge() {
 }
 
 // -- AUTH STATE LISTENER ---------------------------------------
-// -- POLICY GENERATOR -----------------------------------------
+// -- POLICY GENERATOR --
 let selectedPolicyType = 'leave'
 let generatedPolicyText = ''
 
-window.selectPolicyType = (type) => {
+window.selectPolicyType = function(type) {
   selectedPolicyType = type
-  document.querySelectorAll('.policy-type-card').forEach(c => c.classList.remove('active-card'))
+  document.querySelectorAll('.policy-type-card').forEach(function(c) {
+    c.classList.remove('active-card')
+  })
   document.getElementById('ptype-' + type).classList.add('active-card')
 }
 
-const POLICY_TEMPLATES = {
-  leave: (company, industry, size, province, notes) => `${company.toUpperCase()}
-LEAVE POLICY
-In terms of the Basic Conditions of Employment Act 75 of 1997 (BCEA)
-Province: ${province} | Sector: ${industry} | Employees: ${size}
-Effective Date: ${new Date().toLocaleDateString('en-ZA')}
-------------------------------------------------------------
+function buildLeavePolicy(company, industry, size, province, notes) {
+  var lines = []
+  lines.push(company.toUpperCase())
+  lines.push('LEAVE POLICY')
+  lines.push('In terms of the Basic Conditions of Employment Act 75 of 1997 (BCEA)')
+  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
+  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('1. PURPOSE AND SCOPE')
+  lines.push('This Leave Policy applies to all employees of ' + company + ' and has been developed in')
+  lines.push('compliance with the Basic Conditions of Employment Act 75 of 1997, as amended.')
+  lines.push('')
+  lines.push('2. ANNUAL LEAVE')
+  lines.push('2.1 All employees are entitled to 21 consecutive days (15 working days) of paid annual leave per leave cycle.')
+  lines.push('2.2 A leave cycle is a period of 12 months from the first day of employment or anniversary thereof.')
+  lines.push('2.3 Annual leave must be taken at a time agreed upon between the employer and employee.')
+  lines.push('2.4 ' + company + ' may require an employee to take annual leave during or within 6 months after the leave cycle.')
+  lines.push('2.5 Annual leave may not be replaced by payment except upon termination of employment.')
+  lines.push('2.6 Leave not taken within 6 months after the leave cycle will be forfeited unless agreed in writing.')
+  lines.push('')
+  lines.push('3. SICK LEAVE')
+  lines.push('3.1 During every sick leave cycle of 36 months, an employee is entitled to paid sick leave')
+  lines.push('    equal to the number of days the employee would normally work during a period of 6 weeks.')
+  lines.push('3.2 During the first 6 months of employment, an employee is entitled to 1 day paid sick leave')
+  lines.push('    for every 26 days worked.')
+  lines.push('3.3 ' + company + ' may require a medical certificate if an employee is absent for more than')
+  lines.push('    2 consecutive days or on more than 2 occasions in an 8-week period.')
+  lines.push('3.4 A valid medical certificate must be issued by a registered medical practitioner.')
+  lines.push('')
+  lines.push('4. FAMILY RESPONSIBILITY LEAVE')
+  lines.push('4.1 Employees employed for longer than 4 months working more than 4 days per week')
+  lines.push('    are entitled to 3 days paid family responsibility leave per annual leave cycle.')
+  lines.push('4.2 Family responsibility leave may be taken when:')
+  lines.push('    a) The employee child is born')
+  lines.push('    b) The employee child is sick')
+  lines.push('    c) Death of spouse, life partner, parent, grandparent, child, grandchild or sibling')
+  lines.push('4.3 ' + company + ' may require reasonable proof of the event.')
+  lines.push('')
+  lines.push('5. MATERNITY LEAVE')
+  lines.push('5.1 A pregnant employee is entitled to at least 4 consecutive months maternity leave.')
+  lines.push('5.2 An employee may commence maternity leave from 4 weeks before the expected date of birth.')
+  lines.push('5.3 No employee may work for 6 weeks after birth unless a medical practitioner certifies fitness.')
+  lines.push('5.4 Maternity leave is unpaid unless otherwise agreed in the employment contract.')
+  lines.push('')
+  lines.push('6. PATERNITY/PARENTAL LEAVE')
+  lines.push('6.1 A parent is entitled to 10 consecutive days parental leave.')
+  lines.push('6.2 Parental leave commences on the day of the birth or adoption order.')
+  lines.push('')
+  lines.push('7. UNPAID LEAVE')
+  lines.push('7.1 Employees may apply for unpaid leave in exceptional circumstances.')
+  lines.push('7.2 Approval is at the sole discretion of management.')
+  lines.push('7.3 Applications must be submitted at least 10 working days in advance except in emergencies.')
+  lines.push('')
+  lines.push('8. LEAVE APPLICATION PROCEDURE')
+  lines.push('8.1 All leave applications must be submitted via the ' + company + ' Leave Management Portal')
+  lines.push('    prior to commencement of leave, except in cases of emergency.')
+  lines.push('8.2 The direct supervisor must approve all leave applications.')
+  lines.push('8.3 HR Administration must be notified of all approved leave.')
+  lines.push('8.4 Employees must ensure adequate handover before proceeding on leave.')
+  lines.push('')
+  lines.push('9. PUBLIC HOLIDAYS')
+  lines.push('9.1 Employees are entitled to all public holidays as gazetted in the Public Holidays Act 36 of 1994.')
+  lines.push('9.2 When a public holiday falls on a Sunday, the following Monday is observed.')
+  if (notes) {
+    lines.push('')
+    lines.push('10. ADDITIONAL PROVISIONS')
+    lines.push(notes)
+  }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('Approved by: _______________________    Date: _______________')
+  lines.push('HR Manager: ' + company)
+  return lines.join('\n')
+}
 
-1. PURPOSE AND SCOPE
-This Leave Policy applies to all employees of ${company} and has been developed in compliance with the Basic Conditions of Employment Act 75 of 1997, as amended. This policy governs the granting, accumulation, and management of all forms of leave.
+function buildDisciplinaryCode(company, industry, size, province, notes) {
+  var lines = []
+  lines.push(company.toUpperCase())
+  lines.push('DISCIPLINARY CODE AND PROCEDURE')
+  lines.push('In terms of the Labour Relations Act 66 of 1995')
+  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
+  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('1. PURPOSE')
+  lines.push(company + ' is committed to maintaining a productive and harmonious working environment.')
+  lines.push('This Code establishes fair standards of conduct in accordance with the LRA and CCMA Code of Good Practice.')
+  lines.push('')
+  lines.push('2. PRINCIPLES')
+  lines.push('2.1 Disciplinary action shall be corrective rather than punitive.')
+  lines.push('2.2 The principle of progressive discipline shall apply in most cases.')
+  lines.push('2.3 All employees have the right to be heard before any disciplinary action is taken.')
+  lines.push('2.4 No employee shall be dismissed without a fair reason and a fair procedure.')
+  lines.push('')
+  lines.push('3. CATEGORIES OF MISCONDUCT')
+  lines.push('')
+  lines.push('3.1 MINOR MISCONDUCT (First offence -- Verbal Warning)')
+  lines.push('    - Poor timekeeping or late arrivals')
+  lines.push('    - Unauthorised absence of 1 day')
+  lines.push('    - Failure to follow reasonable instructions')
+  lines.push('    - Minor negligence')
+  lines.push('')
+  lines.push('3.2 SERIOUS MISCONDUCT (First offence -- Written Warning)')
+  lines.push('    - Repeated minor misconduct')
+  lines.push('    - Unauthorised absence of 2-3 days')
+  lines.push('    - Disrespectful behaviour toward colleagues')
+  lines.push('    - Negligence resulting in minor loss or damage')
+  lines.push('')
+  lines.push('3.3 GROSS MISCONDUCT (May result in dismissal without prior warnings)')
+  lines.push('    - Theft or fraud of any nature')
+  lines.push('    - Assault or fighting in the workplace')
+  lines.push('    - Sexual harassment')
+  lines.push('    - Wilful damage to company property')
+  lines.push('    - Intoxication at work')
+  lines.push('    - Gross insubordination')
+  lines.push('    - Unauthorised absence of 5 or more consecutive days')
+  lines.push('    - Bribery or corruption')
+  lines.push('')
+  lines.push('4. PROGRESSIVE DISCIPLINE STEPS')
+  lines.push('Step 1: Verbal Warning (valid for 3 months)')
+  lines.push('Step 2: First Written Warning (valid for 6 months)')
+  lines.push('Step 3: Final Written Warning (valid for 12 months)')
+  lines.push('Step 4: Dismissal')
+  lines.push('')
+  lines.push('5. DISCIPLINARY HEARING PROCEDURE')
+  lines.push('5.1 The employee must receive written notice at least 48 hours before the hearing.')
+  lines.push('5.2 The notice must specify the date, time, venue, nature of charges, and right to representation.')
+  lines.push('5.3 The employee may be represented by a fellow employee or shop steward.')
+  lines.push('5.4 The employee must receive written notification of the outcome within 5 working days.')
+  lines.push('5.5 The employee has the right to appeal within 5 working days of the outcome.')
+  lines.push('')
+  lines.push('6. SUSPENSION PENDING INVESTIGATION')
+  lines.push('6.1 ' + company + ' may suspend an employee on full pay pending investigation.')
+  lines.push('6.2 Suspension is not a punitive measure.')
+  if (notes) {
+    lines.push('')
+    lines.push('7. ADDITIONAL PROVISIONS')
+    lines.push(notes)
+  }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('CCMA Contact: 0861 16 2622 | www.ccma.org.za')
+  lines.push('Approved by: _______________________    Date: _______________')
+  lines.push('HR Manager: ' + company)
+  return lines.join('\n')
+}
 
-2. ANNUAL LEAVE
-2.1 All employees are entitled to 21 consecutive days (15 working days) of paid annual leave per leave cycle.
-2.2 A leave cycle is a period of 12 months commencing on the first day of employment or the anniversary thereof.
-2.3 Annual leave must be taken at a time that is agreed upon between the employer and employee.
-2.4 ${company} may require an employee to take annual leave at any time during the leave cycle or within 6 months after the end of the leave cycle.
-2.5 Annual leave may not be replaced by payment in lieu thereof, except upon termination of employment.
-2.6 Leave not taken within 6 months after the end of the leave cycle will be forfeited unless otherwise agreed in writing.
+function buildContract(company, industry, size, province, notes) {
+  var lines = []
+  lines.push(company.toUpperCase())
+  lines.push('STANDARD EMPLOYMENT CONTRACT')
+  lines.push('In terms of the Basic Conditions of Employment Act 75 of 1997')
+  lines.push('Province: ' + province + ' | Sector: ' + industry)
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('EMPLOYER: ' + company)
+  lines.push('EMPLOYEE: _________________________')
+  lines.push('POSITION: _________________________')
+  lines.push('DEPARTMENT: _________________________')
+  lines.push('COMMENCEMENT DATE: _________________________')
+  lines.push('')
+  lines.push('1. NATURE OF EMPLOYMENT')
+  lines.push('1.1 This is a [permanent / fixed-term] contract of employment.')
+  lines.push('1.2 The first 3 months shall constitute a probationary period.')
+  lines.push('')
+  lines.push('2. REMUNERATION')
+  lines.push('2.1 The Employee shall be remunerated at R_______________ per month.')
+  lines.push('2.2 Salary shall be paid on the last working day of each month.')
+  lines.push('2.3 The employer shall deduct PAYE, UIF, and other statutory deductions as required by law.')
+  lines.push('')
+  lines.push('3. WORKING HOURS')
+  lines.push('3.1 Ordinary hours shall not exceed 45 hours per week or 9 hours per day.')
+  lines.push('3.2 Overtime shall be compensated at 1.5 times the ordinary rate on weekdays.')
+  lines.push('3.3 Overtime shall not exceed 10 hours per week.')
+  lines.push('')
+  lines.push('4. LEAVE ENTITLEMENTS')
+  lines.push('4.1 Annual Leave: 21 consecutive days (15 working days) per leave cycle.')
+  lines.push('4.2 Sick Leave: As per ' + company + ' Leave Policy and BCEA.')
+  lines.push('4.3 Family Responsibility Leave: 3 days per annual cycle.')
+  lines.push('4.4 Public Holidays: All gazetted public holidays.')
+  lines.push('')
+  lines.push('5. NOTICE PERIOD')
+  lines.push('5.1 Less than 6 months employment: 1 week notice')
+  lines.push('5.2 6 months to 1 year: 2 weeks notice')
+  lines.push('5.3 More than 1 year: 4 weeks notice')
+  lines.push('5.4 Notice must be given in writing.')
+  lines.push('')
+  lines.push('6. CONFIDENTIALITY')
+  lines.push('6.1 The Employee agrees to keep all business information strictly confidential.')
+  lines.push('6.2 Breach of confidentiality may result in disciplinary action and civil liability.')
+  lines.push('')
+  lines.push('7. CODE OF CONDUCT')
+  lines.push('7.1 The Employee agrees to comply with the ' + company + ' Disciplinary Code and all policies.')
+  if (notes) {
+    lines.push('')
+    lines.push('8. SPECIAL CONDITIONS')
+    lines.push(notes)
+  }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('EMPLOYEE SIGNATURE: _______________________  DATE: ___________')
+  lines.push('EMPLOYER REPRESENTATIVE: __________________  DATE: ___________')
+  lines.push('CCMA: 0861 16 2622 | www.ccma.org.za')
+  return lines.join('\n')
+}
 
-3. SICK LEAVE
-3.1 During every sick leave cycle of 36 months, an employee is entitled to paid sick leave equal to the number of days the employee would normally work during a period of 6 weeks.
-3.2 During the first 6 months of employment, an employee is entitled to 1 day paid sick leave for every 26 days worked.
-3.3 ${company} may require a medical certificate if an employee is absent for more than 2 consecutive days or on more than 2 occasions in an 8-week period.
-3.4 A valid medical certificate must be issued by a registered medical practitioner.
-
-4. FAMILY RESPONSIBILITY LEAVE
-4.1 An employee who has been employed for longer than 4 months and works more than 4 days per week is entitled to 3 days paid family responsibility leave per annual leave cycle.
-4.2 Family responsibility leave may be taken when:
-    a) The employee's child is born;
-    b) The employee's child is sick;
-    c) In the event of the death of the employee's spouse, life partner, parent, adoptive parent, grandparent, child, adopted child, grandchild or sibling.
-4.3 ${company} may require reasonable proof of the event for which the leave is required.
-
-5. MATERNITY LEAVE
-5.1 A pregnant employee is entitled to at least 4 consecutive months maternity leave.
-5.2 An employee may commence maternity leave at any time from 4 weeks before the expected date of birth.
-5.3 No employee may work for 6 weeks after the birth of her child unless a medical practitioner certifies that she is fit to do so.
-5.4 Maternity leave is unpaid unless otherwise agreed or stipulated in the employment contract.
-
-6. PATERNITY LEAVE
-6.1 In terms of the amended BCEA, a parent (commissioning parent or employee who is a parent of a child) is entitled to 10 consecutive days parental leave.
-6.2 Parental leave commences on the day of the child's birth or, in the case of adoption, on the date that a competent court grants an order for adoption.
-
-7. UNPAID LEAVE
-7.1 Employees may apply for unpaid leave in exceptional circumstances.
-7.2 Approval of unpaid leave is at the sole discretion of management.
-7.3 Applications must be submitted in writing at least 10 working days in advance, except in cases of emergency.
-
-8. LEAVE APPLICATION PROCEDURE
-8.1 All leave applications must be submitted via the ${company} Leave Management Portal prior to commencement of leave, except in cases of emergency.
-8.2 The employee's direct supervisor must approve all leave applications.
-8.3 HR Administration must be notified of all approved leave.
-8.4 Employees must ensure adequate handover before proceeding on leave.
-
-9. PUBLIC HOLIDAYS
-9.1 Employees are entitled to all public holidays as gazetted in the Public Holidays Act 36 of 1994.
-9.2 When a public holiday falls on a Sunday, the following Monday is observed as the public holiday.
-
-${notes ? '10. ADDITIONAL PROVISIONS
-' + notes + '
-' : ''}
-------------------------------------------------------------
-This policy is subject to review and amendment. Employees will be notified of any changes.
-Non-compliance with this policy may result in disciplinary action.
-
-Approved by: _______________________    Date: _______________
-HR Manager: ${company}
-
-This document was generated in compliance with the Basic Conditions of Employment Act 75 of 1997.`,
-
-  disciplinary: (company, industry, size, province, notes) => `${company.toUpperCase()}
-DISCIPLINARY CODE AND PROCEDURE
-In terms of the Labour Relations Act 66 of 1995
-Province: ${province} | Sector: ${industry} | Employees: ${size}
-Effective Date: ${new Date().toLocaleDateString('en-ZA')}
-------------------------------------------------------------
-
-1. PURPOSE
-${company} is committed to maintaining a productive and harmonious working environment. This Disciplinary Code establishes fair and consistent standards of conduct and sets out the procedure to be followed when addressing misconduct, in accordance with the Labour Relations Act 66 of 1995 and the CCMA Code of Good Practice: Dismissal.
-
-2. PRINCIPLES OF DISCIPLINARY ACTION
-2.1 Disciplinary action shall be corrective rather than punitive in nature.
-2.2 The principle of progressive discipline shall apply in most cases.
-2.3 All employees have the right to be heard before any disciplinary action is taken.
-2.4 No employee shall be dismissed without a fair reason and a fair procedure.
-2.5 The penalty must be appropriate to the nature and severity of the offence.
-
-3. CATEGORIES OF MISCONDUCT
-
-3.1 MINOR MISCONDUCT (First offence -- Verbal Warning)
-    - Poor timekeeping / late arrivals
-    - Unauthorised absence of 1 day
-    - Failure to follow reasonable instructions
-    - Untidy work area
-    - Minor negligence
-    - Failure to report absence timeously
-
-3.2 SERIOUS MISCONDUCT (First offence -- Written Warning)
-    - Repeated minor misconduct
-    - Unauthorised absence of 2-3 days
-    - Disrespectful behaviour toward colleagues
-    - Negligence resulting in minor loss or damage
-    - Failure to adhere to safety regulations
-    - Falsification of timesheets
-
-3.3 GROSS MISCONDUCT (May result in dismissal without prior warnings)
-    - Theft or fraud of any nature
-    - Assault or fighting in the workplace
-    - Sexual harassment
-    - Wilful damage to company property
-    - Intoxication at work
-    - Possession of illegal substances
-    - Gross insubordination
-    - Unauthorised absence of 5 or more consecutive days
-    - Disclosure of confidential information
-    - Bribery or corruption
-
-4. PROGRESSIVE DISCIPLINE STEPS
-Step 1: Verbal Warning (valid for 3 months)
-Step 2: First Written Warning (valid for 6 months)
-Step 3: Final Written Warning (valid for 12 months)
-Step 4: Dismissal
-
-5. DISCIPLINARY HEARING PROCEDURE
-5.1 NOTICE: The employee must receive written notice of the disciplinary hearing at least 48 hours before the hearing. The notice must specify:
-    a) The date, time, and venue of the hearing
-    b) The nature of the charges in sufficient detail
-    c) The employee's right to be represented
-
-5.2 REPRESENTATION: The employee may be represented by:
-    a) A fellow employee
-    b) A shop steward or union representative
-    c) Legal representation only in exceptional circumstances at the chairperson's discretion
-
-5.3 CONDUCT OF HEARING:
-    a) The chairperson opens the hearing and explains the procedure
-    b) The charges are read and the employee pleads guilty or not guilty
-    c) The employer presents evidence
-    d) The employee has the right to cross-examine witnesses
-    e) The employee presents their case
-    f) Closing arguments are made
-    g) The chairperson considers the evidence and makes a finding
-    h) If guilty, both parties may make submissions on an appropriate sanction
-
-5.4 OUTCOME: The employee must receive written notification of the outcome within 5 working days.
-
-5.5 APPEAL: The employee has the right to appeal the decision within 5 working days of receiving the outcome.
-
-6. SUSPENSION PENDING INVESTIGATION
-6.1 ${company} may suspend an employee on full pay pending a disciplinary investigation.
-6.2 Suspension is not a punitive measure.
-6.3 The period of suspension must be kept as short as possible.
-
-${notes ? '7. ADDITIONAL PROVISIONS
-' + notes + '
-' : ''}
-------------------------------------------------------------
-Employees who feel aggrieved by disciplinary action may refer their case to the CCMA within 30 days of dismissal or within 90 days of any other unfair labour practice.
-CCMA Contact: 0861 16 2622 | www.ccma.org.za
-
-Approved by: _______________________    Date: _______________
-HR Manager: ${company}`,
-
-  contract: (company, industry, size, province, notes) => `${company.toUpperCase()}
-STANDARD EMPLOYMENT CONTRACT
-In terms of the Basic Conditions of Employment Act 75 of 1997
-Province: ${province} | Sector: ${industry}
-------------------------------------------------------------
-
-This Employment Contract is entered into between:
-
-EMPLOYER: ${company} ("the Employer")
-EMPLOYEE: _________________________ ("the Employee")
-EMPLOYEE ID/PERSAL: _________________________
-POSITION: _________________________
-DEPARTMENT: _________________________
-COMMENCEMENT DATE: _________________________
-
-1. NATURE OF EMPLOYMENT
-1.1 This is a [permanent / fixed-term] contract of employment.
-1.2 Fixed-term contracts must specify: End date: _______________ / Reason: _______________
-1.3 The first [3] months of employment shall constitute a probationary period during which either party may terminate this contract with 1 week's notice.
-
-2. REMUNERATION
-2.1 The Employee shall be remunerated at a rate of R_______________ per [month/week].
-2.2 Salary shall be paid on the [last working day] of each month.
-2.3 The employer shall deduct PAYE, UIF, and any other statutory deductions as required by law.
-2.4 UIF contributions: both employer and employee contribute 1% of remuneration.
-
-3. WORKING HOURS
-3.1 Ordinary hours of work shall not exceed 45 hours per week or 9 hours per day.
-3.2 Normal working hours: Monday to Friday, _______ to _______.
-3.3 Overtime shall be compensated at 1.5 times the ordinary rate for weekdays and 2 times for Sundays and public holidays.
-3.4 Overtime shall not exceed 10 hours per week.
-
-4. LEAVE ENTITLEMENTS
-4.1 Annual Leave: 21 consecutive days (15 working days) per leave cycle.
-4.2 Sick Leave: As per the ${company} Leave Policy and BCEA.
-4.3 Family Responsibility Leave: 3 days per annual cycle.
-4.4 Maternity/Parental Leave: As per the amended BCEA.
-4.5 Public Holidays: All gazetted public holidays.
-
-5. TERMINATION OF EMPLOYMENT
-5.1 Notice period required by either party:
-    - Employed less than 6 months: 1 week
-    - Employed 6 months to 1 year: 2 weeks
-    - Employed more than 1 year: 4 weeks
-5.2 Notice must be given in writing.
-5.3 ${company} may pay out the notice period in lieu of notice.
-5.4 Summary dismissal (without notice) may occur in cases of gross misconduct.
-
-6. CONFIDENTIALITY
-6.1 The Employee agrees to keep all business information, client data, trade secrets, and proprietary information strictly confidential during and after employment.
-6.2 Breach of confidentiality will result in disciplinary action and may result in civil liability.
-
-7. INTELLECTUAL PROPERTY
-7.1 All work product, inventions, and intellectual property created by the Employee in the course of employment shall remain the property of ${company}.
-
-8. CODE OF CONDUCT
-8.1 The Employee agrees to comply with the ${company} Code of Conduct, Disciplinary Code, and all company policies.
-8.2 Non-compliance may result in disciplinary action up to and including dismissal.
-
-9. DISPUTE RESOLUTION
-9.1 Any disputes arising from this contract shall first be referred to internal grievance procedures.
-9.2 Unresolved disputes may be referred to the CCMA (Commission for Conciliation, Mediation and Arbitration).
-9.3 CCMA: 0861 16 2622 | www.ccma.org.za
-
-${notes ? '10. SPECIAL CONDITIONS
-' + notes + '
-' : ''}
-------------------------------------------------------------
-
-I, the undersigned, acknowledge that I have read and understood this contract and agree to be bound by its terms.
-
-EMPLOYEE SIGNATURE: _______________________  DATE: ___________
-FULL NAME (PRINT): _________________________
-
-EMPLOYER REPRESENTATIVE: __________________  DATE: ___________
-NAME & DESIGNATION: _______________________
-
-WITNESS: __________________________________  DATE: ___________`,
-
-  grievance: (company, industry, size, province, notes) => `${company.toUpperCase()}
-GRIEVANCE PROCEDURE
-In terms of the Labour Relations Act 66 of 1995
-Province: ${province} | Sector: ${industry} | Employees: ${size}
-Effective Date: ${new Date().toLocaleDateString('en-ZA')}
-------------------------------------------------------------
-
-1. PURPOSE
-${company} recognises that employees may from time to time have legitimate grievances relating to their employment. This procedure provides a fair, transparent and timely mechanism for resolving such grievances, in accordance with the Labour Relations Act 66 of 1995.
-
-2. DEFINITION OF A GRIEVANCE
-A grievance is any complaint or concern raised by an employee relating to:
-    - Working conditions
-    - Relationships with colleagues or supervisors
-    - Application of company policies
-    - Perceived unfair treatment
-    - Health and safety concerns
-    - Any other work-related matter
-
-3. PRINCIPLES
-3.1 All grievances will be treated seriously and investigated promptly.
-3.2 Employees will not be victimised for raising a legitimate grievance.
-3.3 All parties have the right to be heard.
-3.4 Confidentiality will be maintained to the greatest extent possible.
-
-4. GRIEVANCE PROCEDURE
-
-STEP 1 -- INFORMAL RESOLUTION (Within 2 working days)
-4.1 The employee should first attempt to resolve the matter informally by discussing it directly with their immediate supervisor.
-4.2 The supervisor must respond within 2 working days.
-4.3 If resolved, a record of the resolution must be kept by HR.
-
-STEP 2 -- FORMAL GRIEVANCE (Within 5 working days)
-4.4 If the matter is not resolved informally, the employee must submit a written grievance to HR using the Grievance Form.
-4.5 The grievance must clearly state:
-    a) The nature of the grievance
-    b) How it arose
-    c) The relief or outcome sought
-4.6 HR must acknowledge receipt within 2 working days.
-4.7 A formal grievance meeting must be held within 5 working days of receipt.
-4.8 The employee may be accompanied by a fellow employee or shop steward.
-
-STEP 3 -- MANAGEMENT REVIEW (Within 5 working days)
-4.9 If the employee is dissatisfied with the outcome of Step 2, the grievance is escalated to senior management.
-4.10 Senior management must convene a review meeting within 5 working days.
-4.11 A written response must be provided within 3 working days of the meeting.
-
-STEP 4 -- EXTERNAL DISPUTE RESOLUTION
-4.12 If the matter remains unresolved after Step 3, the employee may refer the dispute to the CCMA or relevant Bargaining Council.
-4.13 Time frames for CCMA referral: unfair labour practice -- 90 days; unfair dismissal -- 30 days.
-
-5. RECORD KEEPING
-5.1 HR must maintain a register of all formal grievances.
-5.2 Records must be kept for a minimum of 3 years.
-5.3 Grievance records are confidential and accessible only to authorised personnel.
-
-6. ANTI-VICTIMISATION
-6.1 No employee shall be subjected to any form of victimisation, intimidation or disadvantage as a result of raising a grievance in good faith.
-6.2 Any victimisation will itself be treated as a disciplinary matter.
-
-${notes ? '7. ADDITIONAL PROVISIONS
-' + notes + '
-' : ''}
-------------------------------------------------------------
-CCMA Contact: 0861 16 2622 | www.ccma.org.za
-Department of Labour: 0800 601 011
-
-Approved by: _______________________    Date: _______________
-HR Manager: ${company}`
+function buildGrievance(company, industry, size, province, notes) {
+  var lines = []
+  lines.push(company.toUpperCase())
+  lines.push('GRIEVANCE PROCEDURE')
+  lines.push('In terms of the Labour Relations Act 66 of 1995')
+  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
+  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('1. PURPOSE')
+  lines.push(company + ' recognises that employees may from time to time have legitimate grievances.')
+  lines.push('This procedure provides a fair and timely mechanism for resolving such grievances.')
+  lines.push('')
+  lines.push('2. DEFINITION')
+  lines.push('A grievance is any complaint relating to:')
+  lines.push('    - Working conditions')
+  lines.push('    - Relationships with colleagues or supervisors')
+  lines.push('    - Application of company policies')
+  lines.push('    - Perceived unfair treatment')
+  lines.push('    - Health and safety concerns')
+  lines.push('')
+  lines.push('3. PRINCIPLES')
+  lines.push('3.1 All grievances will be treated seriously and investigated promptly.')
+  lines.push('3.2 Employees will not be victimised for raising a legitimate grievance.')
+  lines.push('3.3 Confidentiality will be maintained to the greatest extent possible.')
+  lines.push('')
+  lines.push('4. GRIEVANCE PROCEDURE')
+  lines.push('')
+  lines.push('STEP 1 -- INFORMAL RESOLUTION (Within 2 working days)')
+  lines.push('The employee should first discuss the matter directly with their immediate supervisor.')
+  lines.push('The supervisor must respond within 2 working days.')
+  lines.push('')
+  lines.push('STEP 2 -- FORMAL GRIEVANCE (Within 5 working days)')
+  lines.push('If unresolved, the employee submits a written grievance to HR.')
+  lines.push('HR must acknowledge receipt within 2 working days.')
+  lines.push('A formal grievance meeting must be held within 5 working days.')
+  lines.push('The employee may be accompanied by a fellow employee or shop steward.')
+  lines.push('')
+  lines.push('STEP 3 -- MANAGEMENT REVIEW (Within 5 working days)')
+  lines.push('If still unresolved, the grievance is escalated to senior management.')
+  lines.push('A written response must be provided within 3 working days of the review meeting.')
+  lines.push('')
+  lines.push('STEP 4 -- EXTERNAL DISPUTE RESOLUTION')
+  lines.push('The employee may refer the dispute to the CCMA or relevant Bargaining Council.')
+  lines.push('Unfair labour practice referral: within 90 days.')
+  lines.push('Unfair dismissal referral: within 30 days.')
+  lines.push('')
+  lines.push('5. ANTI-VICTIMISATION')
+  lines.push('No employee shall be victimised for raising a grievance in good faith.')
+  lines.push('Any victimisation will itself be treated as a disciplinary matter.')
+  if (notes) {
+    lines.push('')
+    lines.push('6. ADDITIONAL PROVISIONS')
+    lines.push(notes)
+  }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('CCMA Contact: 0861 16 2622 | www.ccma.org.za')
+  lines.push('Approved by: _______________________    Date: _______________')
+  lines.push('HR Manager: ' + company)
+  return lines.join('\n')
 }
 
 window.generatePolicy = async () => {
@@ -1337,7 +1296,13 @@ window.generatePolicy = async () => {
   // Simulate generation delay for effect
   await new Promise(r => setTimeout(r, 1200))
 
-  generatedPolicyText = POLICY_TEMPLATES[selectedPolicyType](company, industry, size, province, notes)
+  var builders = {
+    leave: buildLeavePolicy,
+    disciplinary: buildDisciplinaryCode,
+    contract: buildContract,
+    grievance: buildGrievance
+  }
+  generatedPolicyText = builders[selectedPolicyType](company, industry, size, province, notes)
 
   document.getElementById('policy-content').textContent = generatedPolicyText
   document.getElementById('policy-output').classList.remove('hidden')

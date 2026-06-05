@@ -1549,13 +1549,52 @@ window.generatePolicy = async () => {
   // Simulate generation delay for effect
   await new Promise(r => setTimeout(r, 1200))
 
-  var builders = {
-    leave: buildLeavePolicy,
-    disciplinary: buildDisciplinaryCode,
-    contract: buildContract,
-    grievance: buildGrievance
+  try {
+    // Call AI Edge Function
+    const { data: { session } } = await sb.auth.getSession()
+    const res = await fetch(
+      'https://tlnomboqhglhbyyxdgwo.supabase.co/functions/v1/generate-policy',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify({
+          company, industry, size, province, notes,
+          policy_type: selectedPolicyType
+        })
+      }
+    )
+    const result = await res.json()
+
+    if (result.error) {
+      // Fallback to template if AI fails
+      console.warn('AI failed, using template:', result.error)
+      var builders = {
+        leave: buildLeavePolicy,
+        disciplinary: buildDisciplinaryCode,
+        contract: buildContract,
+        grievance: buildGrievance
+      }
+      generatedPolicyText = builders[selectedPolicyType](company, industry, size, province, notes)
+      toast('Generated using template (AI unavailable).', 'warning')
+    } else {
+      generatedPolicyText = result.document
+      toast('AI document generated successfully!', 'success')
+    }
+  } catch(err) {
+    // Fallback to template on network error
+    console.warn('Network error, using template:', err)
+    var builders2 = {
+      leave: buildLeavePolicy,
+      disciplinary: buildDisciplinaryCode,
+      contract: buildContract,
+      grievance: buildGrievance
+    }
+    generatedPolicyText = builders2[selectedPolicyType](company, industry, size, province, notes)
+    toast('Generated using template (offline).', 'warning')
   }
-  generatedPolicyText = builders[selectedPolicyType](company, industry, size, province, notes)
 
   document.getElementById('policy-content').textContent = generatedPolicyText
   document.getElementById('policy-output').classList.remove('hidden')
@@ -1564,9 +1603,7 @@ window.generatePolicy = async () => {
   btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Document'
   btn.disabled = false
 
-  // Scroll to output
   document.getElementById('policy-output').scrollIntoView({ behavior: 'smooth', block: 'start' })
-  toast('Document generated successfully!', 'success')
 }
 
 window.downloadPolicy = () => {

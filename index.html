@@ -115,6 +115,7 @@ body{background:#f0f4f8;color:var(--gray-900);line-height:1.6;overflow-x:hidden;
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:24px;}
+@media(max-width:500px){.stats-grid{grid-template-columns:1fr 1fr;gap:10px;}}
 .stat-card{background:white;padding:20px;border-radius:var(--radius);display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.04);transition:transform 0.2s;}
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
 .stat-label{font-size:0.72rem;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
@@ -242,7 +243,9 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
 
   /* Content */
   #content-area{height:100vh;}
-  .view-wrap{padding:16px 14px;}
+  .view-wrap{padding:14px 12px;}
+  /* Dashboard hero on mobile */
+  .view-wrap > div[style*="linear-gradient"]{padding:18px 16px!important;margin-bottom:16px!important;}
   .pg-title{font-size:1.15rem;}
 
   /* Stats */
@@ -431,7 +434,7 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
     </div>
   </aside>
   <!-- Mobile overlay to close sidebar when clicking outside -->
-  <div id="sb-overlay" class="sb-overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199;backdrop-filter:blur(2px);"></div>
+  <div id="sb-overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:199;"></div>
 
   <main id="content-area">
     <header class="top-bar">
@@ -906,18 +909,27 @@ window.doRegister = async (e) => {
 window.toggleSidebar = function() {
   var sb = document.getElementById('sidebar')
   var overlay = document.getElementById('sb-overlay')
+  if (!sb || !overlay) return
   var isOpen = sb.classList.contains('open')
   if (isOpen) {
     sb.classList.remove('open')
     overlay.style.display = 'none'
+    document.body.style.overflow = ''
   } else {
     sb.classList.add('open')
-    overlay.style.display = 'block'
+    // Only show overlay on mobile
+    if (window.innerWidth <= 768) {
+      overlay.style.display = 'block'
+      document.body.style.overflow = 'hidden'
+    }
   }
 }
 window.closeSidebar = function() {
-  document.getElementById('sidebar').classList.remove('open')
-  document.getElementById('sb-overlay').style.display = 'none'
+  var sb = document.getElementById('sidebar')
+  var overlay = document.getElementById('sb-overlay')
+  if (sb) sb.classList.remove('open')
+  if (overlay) overlay.style.display = 'none'
+  document.body.style.overflow = ''
 }
 
 // Close sidebar when a nav item is clicked on mobile

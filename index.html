@@ -227,6 +227,54 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
 .policy-type-card:hover{border-color:var(--primary);transform:translateY(-3px);box-shadow:var(--shadow-lg);}
 .active-card{border-color:var(--primary)!important;background:var(--primary-light)!important;box-shadow:0 4px 16px rgba(26,86,219,0.15)!important;}
 
+/* PAGE TRANSITIONS */
+.app-view{animation:fadeIn 0.18s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* PROGRESS BAR */
+.progress-bar-wrap{background:var(--gray-100);border-radius:20px;height:6px;margin-top:6px;overflow:hidden;}
+.progress-bar-fill{height:100%;border-radius:20px;transition:width 0.4s ease;}
+
+/* FIELD ERROR */
+.field-error{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,0.1)!important;}
+.field-error-msg{color:#ef4444;font-size:0.75rem;margin-top:4px;display:flex;align-items:center;gap:4px;}
+
+/* STEP INDICATOR */
+.step-indicator{display:flex;align-items:center;gap:0;margin-bottom:20px;}
+.step-item{display:flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:600;}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;}
+.step-active .step-num{background:var(--primary);color:white;}
+.step-done .step-num{background:#10b981;color:white;}
+.step-inactive .step-num{background:var(--gray-200);color:var(--gray-500);}
+.step-active .step-label{color:var(--primary);font-weight:600;}
+.step-inactive .step-label{color:var(--gray-400);}
+.step-done .step-label{color:#10b981;}
+.step-line{flex:1;height:2px;background:var(--gray-200);margin:0 8px;min-width:20px;}
+.step-line.done{background:#10b981;}
+
+/* SUCCESS SCREEN */
+.success-screen{text-align:center;padding:40px 20px;}
+.success-icon{width:70px;height:70px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2rem;color:#059669;}
+
+/* AVATAR COLORS */
+.avatar-color-0{background:linear-gradient(135deg,#0ea5e9,#1a56db);}
+.avatar-color-1{background:linear-gradient(135deg,#8b5cf6,#6d28d9);}
+.avatar-color-2{background:linear-gradient(135deg,#f59e0b,#d97706);}
+.avatar-color-3{background:linear-gradient(135deg,#10b981,#059669);}
+.avatar-color-4{background:linear-gradient(135deg,#ef4444,#dc2626);}
+.avatar-color-5{background:linear-gradient(135deg,#ec4899,#be185d);}
+
+/* TOOLTIP */
+[data-tip]{position:relative;}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--dark);color:white;padding:4px 10px;border-radius:6px;font-size:0.72rem;white-space:nowrap;z-index:100;pointer-events:none;}
+[data-tip]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--dark);z-index:100;}
+
+/* LOGO SVG */
+.nexahr-logo{display:flex;align-items:center;gap:8px;}
+.nexahr-logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#0ea5e9,#1a56db);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nexahr-logo-text{font-size:1.25rem;font-weight:800;letter-spacing:-0.5px;color:white;}
+.nexahr-logo-text span{color:#0ea5e9;}
+
 /* FOOTER */
 .foot{background:var(--dark);color:rgba(255,255,255,0.5);text-align:center;padding:14px;font-size:0.72rem;}
 
@@ -311,7 +359,12 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
 <!-- LOADING -->
 <div id="loading-overlay" class="loading-overlay">
   <div class="loading-logo">
-    <div class="loading-icon"><i class="fa-solid fa-briefcase"></i></div>
+    <div class="loading-icon">
+    <svg width="26" height="26" viewBox="0 0 22 22" fill="none">
+      <path d="M3 6h6v10H3V6zm10-3h6v13h-6V3z" fill="white" opacity="0.9"/>
+      <path d="M7 11h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
     <div class="loading-name">NexaHR</div>
   </div>
   <div class="spinner"></div>
@@ -340,7 +393,12 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
     <div class="auth-box">
     <div class="auth-head">
       <div class="auth-logo">
-        <div class="auth-logo-icon"><i class="fa-solid fa-briefcase"></i></div>
+        <div class="auth-logo-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 6h6v10H3V6zm10-3h6v13h-6V3z" fill="white" opacity="0.9"/>
+            <path d="M7 11h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
         <div class="auth-logo-name">NexaHR</div>
       </div>
       <div class="auth-subtitle">Smart HR Management for South Africa</div>
@@ -410,7 +468,12 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
 <div id="main-app" class="hidden">
   <aside id="sidebar">
     <div class="sb-logo">
-      <div class="sb-logo-icon"><i class="fa-solid fa-briefcase"></i></div>
+      <div class="sb-logo-icon">
+        <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+          <path d="M3 6h6v10H3V6zm10-3h6v13h-6V3z" fill="white" opacity="0.9"/>
+          <path d="M7 11h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div>
         <div class="sb-logo-text">NexaHR</div>
         <div class="sb-logo-sub">Smart HR Management</div>
@@ -575,7 +638,9 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
         <div class="form-paper" id="printable">
           <div class="off-header">
             <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;">
-              <div style="width:32px;height:32px;background:linear-gradient(135deg,#0ea5e9,#1a56db);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.9rem;"><i class="fa-solid fa-briefcase"></i></div>
+              <div style="width:32px;height:32px;background:linear-gradient(135deg,#0ea5e9,#1a56db);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                <svg width="18" height="18" viewBox="0 0 22 22" fill="none"><path d="M3 6h6v10H3V6zm10-3h6v13h-6V3z" fill="white" opacity="0.9"/><path d="M7 11h8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
               <span style="font-size:1.3rem;font-weight:800;color:#0f172a;">NexaHR</span>
             </div>
             <h1>Application for Leave of Absence</h1>
@@ -644,7 +709,24 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
       <!-- POLICY GENERATOR -->
       <section id="view-policy-gen" class="app-view hidden">
         <div class="pg-title">HR Policy Generator</div>
-        <div class="pg-sub">Generate BCEA-compliant HR documents for your organisation</div>
+        <div class="pg-sub">Generate BCEA-compliant HR documents for your organisation in seconds</div>
+
+        <div class="step-indicator" style="margin-bottom:24px;">
+          <div class="step-item step-done" id="step1">
+            <div class="step-num"><i class="fa-solid fa-check" style="font-size:0.7rem;"></i></div>
+            <div class="step-label">Choose Type</div>
+          </div>
+          <div class="step-line done" id="line1"></div>
+          <div class="step-item step-active" id="step2">
+            <div class="step-num">2</div>
+            <div class="step-label">Company Details</div>
+          </div>
+          <div class="step-line" id="line2"></div>
+          <div class="step-item step-inactive" id="step3">
+            <div class="step-num">3</div>
+            <div class="step-label">Download</div>
+          </div>
+        </div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
           <!-- Document type cards -->
@@ -983,7 +1065,15 @@ async function initApp(user) {
   cp = profile
   const displayName = cp?.full_name || user.email
   document.getElementById('user-name-display').textContent = displayName
-  document.getElementById('user-avatar').textContent = ini(displayName)
+  const avatarEl = document.getElementById('user-avatar')
+  const avatarBig = document.getElementById('prof-avatar-big')
+  const colorIdx = displayName.charCodeAt(0) % 6
+  avatarEl.textContent = ini(displayName)
+  avatarEl.className = 'avatar avatar-color-' + colorIdx
+  if (avatarBig) {
+    avatarBig.textContent = ini(displayName)
+    avatarBig.className = 'profile-avatar-big avatar-color-' + colorIdx
+  }
   if (cp?.role === 'manager' || cp?.role === 'hr_admin') {
     document.getElementById('mgr-nav').classList.remove('hidden')
   }
@@ -1053,7 +1143,14 @@ function renderDash() {
   })
   document.getElementById('balance-grid').innerHTML = Object.entries(LEAVE_BALANCES).map(([type,total]) => {
     const used = usedMap[type]||0, rem = Math.max(0,total-used)
-    return `<div class="balance-card"><div class="days">${rem}</div><div class="type">${type}</div><div class="used">${used} used of ${total}</div></div>`
+    const pct = Math.round((used/total)*100)
+    const barColor = pct > 80 ? '#ef4444' : pct > 50 ? '#f59e0b' : '#10b981'
+    return '<div class="balance-card">' +
+      '<div class="days">' + rem + '</div>' +
+      '<div class="type">' + type + '</div>' +
+      '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
+      '<div class="used">' + used + ' used of ' + total + ' days</div>' +
+    '</div>'
   }).join('')
   const tb = document.querySelector('#recent-tbl tbody')
   const rc = my.slice(0,5)
@@ -1075,20 +1172,41 @@ function renderHist() {
     <td>${fmt(a.start_date)}</td><td>${a.working_days}</td>
     <td><span class="badge badge-${a.status}">${a.status.toUpperCase()}</span></td>
     <td style="display:flex;gap:5px;flex-wrap:wrap;">
-      <button class="btn btn-primary btn-sm" onclick="viewApp('${a.id}')"><i class="fa-solid fa-eye"></i></button>
-      ${a.status==='pending' ? `<button class="btn btn-danger btn-sm" onclick="askCancel('${a.id}')"><i class="fa-solid fa-ban"></i> Cancel</button>` : ''}
+      <button class="btn btn-primary btn-sm" onclick="viewApp('${a.id}')" data-tip="View details"><i class="fa-solid fa-eye"></i></button>
+      ${a.status==='pending' ? `<button class="btn btn-danger btn-sm" onclick="askCancel('${a.id}')" data-tip="Cancel application"><i class="fa-solid fa-ban"></i></button>` : ''}
     </td>
-  </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:22px;color:#bbb;">No applications found.</td></tr>'
+  </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);font-size:0.9rem;"><i class=\"fa-regular fa-clipboard\" style=\"font-size:2rem;display:block;margin-bottom:10px;opacity:0.4;\"></i>No applications found.<br><small style=\"color:var(--gray-300)\">Applications will appear here once employees submit leave requests</small></td></tr>'
 }
 
 // -- SUBMIT LEAVE ----------------------------------------------
 window.submitLeave = async () => {
+  // Clear previous errors
+  document.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'))
+  document.querySelectorAll('.field-error-msg').forEach(el => el.remove())
+
   const lt = document.querySelector('input[name="ltype"]:checked')
   const sn = document.getElementById('f-surname').value.trim()
   const sd = document.getElementById('f-start').value
   const dy = document.getElementById('f-days').value
   const sg = document.getElementById('f-sig').value.trim()
-  if (!lt||!sn||!sd||!dy||!sg) return toast('Please complete all required fields (*)', 'error')
+
+  function markError(id, msg) {
+    const el = document.getElementById(id)
+    if (!el) return
+    el.classList.add('field-error')
+    const err = document.createElement('div')
+    err.className = 'field-error-msg'
+    err.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + msg
+    el.parentNode.appendChild(err)
+  }
+
+  let hasError = false
+  if (!lt) { toast('Please select a leave type.', 'error'); hasError = true }
+  if (!sn) { markError('f-surname', 'Surname is required'); hasError = true }
+  if (!sd) { markError('f-start', 'Start date is required'); hasError = true }
+  if (!dy) { markError('f-days', 'Number of days required'); hasError = true }
+  if (!sg) { markError('f-sig', 'Electronic signature is required'); hasError = true }
+  if (hasError) return
   const endD = new Date(sd)
   endD.setDate(endD.getDate() + parseInt(dy) - 1)
   const { data, error } = await sb.from('leave_applications').insert({
@@ -1102,11 +1220,24 @@ window.submitLeave = async () => {
     status: 'pending'
   }).select().single()
   if (error) return toast('Submission failed: ' + error.message, 'error')
-  toast('Application submitted successfully!', 'success')
+
   // Notify manager by email
   if (data?.id) await notifyLeave(data.id, 'submitted')
   await loadAllApps()
-  showView('my-apps')
+
+  // Show success screen briefly before redirecting
+  const refId = data?.id?.slice(0,8).toUpperCase() || 'SUBMITTED'
+  const formArea = document.getElementById('view-apply-leave')
+  const originalContent = formArea.innerHTML
+  formArea.innerHTML = '<div class="success-screen">' +
+    '<div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>' +
+    '<h2 style="font-size:1.3rem;font-weight:800;color:var(--gray-900);margin-bottom:8px;">Application Submitted!</h2>' +
+    '<p style="color:var(--gray-500);margin-bottom:6px;">Your leave application has been submitted successfully.</p>' +
+    '<p style="color:var(--gray-500);font-size:0.85rem;margin-bottom:20px;">Reference: <strong style="color:var(--primary);">#' + refId + '</strong></p>' +
+    '<p style="color:var(--gray-400);font-size:0.82rem;margin-bottom:24px;">Your manager has been notified by email and will review your application shortly.</p>' +
+    '<button class="btn btn-primary" onclick="showView('my-apps')"><i class="fa-solid fa-list-check"></i> View My Applications</button>' +
+    '</div>'
+  setTimeout(() => { showView('my-apps') }, 4000)
 }
 
 // -- MANAGER TABLE ---------------------------------------------
@@ -1124,11 +1255,11 @@ function renderMgr() {
     <td><span class="badge badge-${a.status}">${a.status.toUpperCase()}</span></td>
     <td style="display:flex;gap:5px;flex-wrap:wrap;">
       ${a.status==='pending' ? `
-        <button class="btn btn-primary btn-sm" onclick="setStatus('${a.id}','approved')" title="Approve"><i class="fa-solid fa-check"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="askReject('${a.id}')" title="Reject"><i class="fa-solid fa-xmark"></i></button>` : ''}
-      <button class="btn btn-sm" style="background:#e0e0e0;color:#333" onclick="viewApp('${a.id}')"><i class="fa-solid fa-eye"></i></button>
+        <button class="btn btn-primary btn-sm" onclick="setStatus('${a.id}','approved')" data-tip="Approve"><i class="fa-solid fa-check"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="askReject('${a.id}')" data-tip="Reject"><i class="fa-solid fa-xmark"></i></button>` : ''}
+      <button class="btn btn-sm" style="background:var(--gray-100);color:var(--gray-700)" onclick="viewApp('${a.id}')" data-tip="View details"><i class="fa-solid fa-eye"></i></button>
     </td>
-  </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:22px;color:#bbb;">No applications found.</td></tr>'
+  </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);font-size:0.9rem;"><i class=\"fa-regular fa-clipboard\" style=\"font-size:2rem;display:block;margin-bottom:10px;opacity:0.4;\"></i>No applications found.<br><small style=\"color:var(--gray-300)\">Applications will appear here once employees submit leave requests</small></td></tr>'
 }
 window.filterMgr = (f) => { mgrFilter=f; renderMgr() }
 
@@ -1238,7 +1369,14 @@ function renderProfile() {
   })
   document.getElementById('prof-balance-grid').innerHTML = Object.entries(LEAVE_BALANCES).map(([type,total]) => {
     const used=usedMap[type]||0, rem=Math.max(0,total-used)
-    return `<div class="balance-card"><div class="days">${rem}</div><div class="type">${type}</div><div class="used">${used} used of ${total}</div></div>`
+    const pct = Math.round((used/total)*100)
+    const barColor = pct > 80 ? '#ef4444' : pct > 50 ? '#f59e0b' : '#10b981'
+    return '<div class="balance-card">' +
+      '<div class="days">' + rem + '</div>' +
+      '<div class="type">' + type + '</div>' +
+      '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
+      '<div class="used">' + used + ' used of ' + total + ' days</div>' +
+    '</div>'
   }).join('')
 }
 window.saveProfile = async () => {
@@ -1296,6 +1434,11 @@ window.selectPolicyType = function(type) {
     c.classList.remove('active-card')
   })
   document.getElementById('ptype-' + type).classList.add('active-card')
+  // Update step indicator
+  var s1 = document.getElementById('step1')
+  var l1 = document.getElementById('line1')
+  if (s1) { s1.className = 'step-item step-done' }
+  if (l1) { l1.className = 'step-line done' }
 }
 
 function buildLeavePolicy(company, industry, size, province, notes) {
@@ -1616,6 +1759,13 @@ window.generatePolicy = async () => {
     } else {
       generatedPolicyText = result.document
       toast('AI document generated successfully!', 'success')
+  // Update step indicator to step 3
+  var s3 = document.getElementById('step3')
+  var l2 = document.getElementById('line2')
+  var s2 = document.getElementById('step2')
+  if (s3) { s3.className = 'step-item step-active' }
+  if (s2) { s2.className = 'step-item step-done' }
+  if (l2) { l2.className = 'step-line done' }
     }
   } catch(err) {
     // Fallback to template on network error
@@ -1810,7 +1960,29 @@ let appInitialised = false
 
 async function bootApp() {
   try {
-    const { data: { session } } = await sb.auth.getSession()
+    // First try to get session with a timeout for slow mobile connections
+    const sessionPromise = sb.auth.getSession()
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('timeout')), 8000)
+    )
+    
+    let session = null
+    try {
+      const result = await Promise.race([sessionPromise, timeoutPromise])
+      session = result.data?.session
+    } catch(e) {
+      if (e.message === 'timeout') {
+        // On timeout, retry once more
+        console.log('Session fetch timed out, retrying...')
+        try {
+          const retry = await sb.auth.getSession()
+          session = retry.data?.session
+        } catch(retryErr) {
+          console.error('Retry failed:', retryErr)
+        }
+      }
+    }
+
     if (session && session.user) {
       await initApp(session.user)
     } else {

@@ -485,8 +485,10 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
       <a class="nav-item" onclick="showView('my-apps')"><i class="fa-solid fa-list-check"></i> My Applications</a>
       <a class="nav-item" onclick="showView('calendar')"><i class="fa-solid fa-calendar-days"></i> Leave Calendar</a>
       <a class="nav-item" onclick="showView('profile')"><i class="fa-solid fa-user-circle"></i> My Profile</a>
-      <div class="nav-section">Tools</div>
-      <a class="nav-item" onclick="showView('policy-gen')"><i class="fa-solid fa-file-shield"></i> Policy Generator</a>
+      <div id="tools-nav" class="hidden">
+        <div class="nav-section">Tools</div>
+        <a class="nav-item" onclick="showView('policy-gen')"><i class="fa-solid fa-file-shield"></i> Policy Generator</a>
+      </div>
       <div id="mgr-nav" class="hidden">
         <div class="nav-section">Management</div>
         <a class="nav-item" onclick="showView('mgr-dash')"><i class="fa-solid fa-people-roof"></i> Team Requests</a>
@@ -687,7 +689,10 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
 
       <!-- MANAGER DASHBOARD -->
       <section id="view-mgr-dash" class="app-view hidden">
-        <div class="pg-title">Team Leave Requests</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:5px;">
+          <div class="pg-title">Team Leave Requests</div>
+          <button class="btn btn-gold btn-sm" onclick="showView('reset-leave')"><i class="fa-solid fa-rotate-left"></i> Reset Leave Balances</button>
+        </div>
         <div class="pg-sub">Review, approve or reject employee leave requests</div>
         <div class="stats-grid">
           <div class="stat-card" style="border-color:#ff9800"><div><div class="stat-label">Pending</div><div class="stat-val" style="color:#f57f17" id="mgr-p">0</div></div><div class="si si-a"><i class="fa-solid fa-hourglass-half"></i></div></div>
@@ -822,6 +827,53 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
           </div>
         </div>
 
+      </section>
+
+      <!-- RESET LEAVE BALANCES -->
+      <section id="view-reset-leave" class="app-view hidden">
+        <div class="pg-title">Reset Leave Balances</div>
+        <div class="pg-sub">Reset leave balances for employees at the start of a new leave cycle</div>
+        <div class="card">
+          <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;display:flex;gap:10px;">
+            <i class="fa-solid fa-triangle-exclamation" style="color:#d97706;flex-shrink:0;margin-top:2px;"></i>
+            <div>
+              <p style="font-size:13px;font-weight:600;color:#92400e;margin:0 0 3px;">Cannot be undone</p>
+              <p style="font-size:12px;color:#92400e;margin:0;">This resets used days back to zero. Only do this at the start of a new annual leave cycle.</p>
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:16px;">
+            <div class="form-group">
+              <label>Leave Type to Reset</label>
+              <select id="reset-leave-type">
+                <option value="Annual Leave">Annual Leave</option>
+                <option value="Normal Sick Leave">Normal Sick Leave</option>
+                <option value="Family Responsibility Leave">Family Responsibility Leave</option>
+                <option value="Paternity Leave">Paternity Leave</option>
+                <option value="Adoption Leave">Adoption Leave</option>
+                <option value="Pre-natal Leave">Pre-natal Leave</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Reset For</label>
+              <select id="reset-scope" onchange="toggleResetEmployee()">
+                <option value="all">All Employees</option>
+                <option value="single">Specific Employee</option>
+              </select>
+            </div>
+          </div>
+          <div id="reset-employee-select" class="form-group hidden">
+            <label>Select Employee</label>
+            <select id="reset-employee-id"><option value="">Select an employee...</option></select>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+            <button class="btn btn-gold" onclick="resetLeaveBalance()"><i class="fa-solid fa-rotate-left"></i> Reset Balance</button>
+            <button class="btn" style="background:var(--gray-100);color:var(--gray-700);" onclick="showView('mgr-dash')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:0.95rem;font-weight:700;color:var(--gray-900);margin-bottom:14px;"><i class="fa-solid fa-clock-rotate-left"></i> Reset History</h3>
+          <div id="reset-history-list"><p style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:20px;">No resets recorded yet.</p></div>
+        </div>
       </section>
 
     </div>
@@ -1040,6 +1092,9 @@ window.doLogout = async () => {
 
 // -- INIT APP -------------------------------------------------
 async function initApp(user) {
+  // Cache user in localStorage for fast mobile loading
+  try { localStorage.setItem('nexahr_user', JSON.stringify(user)) } catch(e) {}
+
   // Reset all state cleanly on every init
   cu = user
   cp = null
@@ -1076,6 +1131,7 @@ async function initApp(user) {
   }
   if (cp?.role === 'manager' || cp?.role === 'hr_admin') {
     document.getElementById('mgr-nav').classList.remove('hidden')
+    document.getElementById('tools-nav').classList.remove('hidden')
   }
   document.getElementById('auth-page').classList.add('hidden')
   document.getElementById('main-app').classList.remove('hidden')
@@ -1104,6 +1160,7 @@ window.showView = async (v) => {
   if (v==='dash-home') renderDash()
   if (v==='my-apps') { await loadAllApps(); renderHist(); clearNotifBadge() }
   if (v==='mgr-dash') { await loadAllApps(); renderMgr() }
+  if (v==='reset-leave') { renderResetHistory(); document.getElementById('reset-scope').value='all'; document.getElementById('reset-employee-select').classList.add('hidden') }
   if (v==='calendar') { await loadAllApps(); renderCalendar() }
   if (v==='profile') renderProfile()
   if (v==='apply-leave') {
@@ -1226,18 +1283,28 @@ window.submitLeave = async () => {
   await loadAllApps()
 
   // Show success screen briefly before redirecting
-  const refId = data?.id?.slice(0,8).toUpperCase() || 'SUBMITTED'
-  const formArea = document.getElementById('view-apply-leave')
-  const originalContent = formArea.innerHTML
-  formArea.innerHTML = '<div class="success-screen">' +
-    '<div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>' +
-    '<h2 style="font-size:1.3rem;font-weight:800;color:var(--gray-900);margin-bottom:8px;">Application Submitted!</h2>' +
-    '<p style="color:var(--gray-500);margin-bottom:6px;">Your leave application has been submitted successfully.</p>' +
-    '<p style="color:var(--gray-500);font-size:0.85rem;margin-bottom:20px;">Reference: <strong style="color:var(--primary);">#' + refId + '</strong></p>' +
-    '<p style="color:var(--gray-400);font-size:0.82rem;margin-bottom:24px;">Your manager has been notified by email and will review your application shortly.</p>' +
-    '<button class="btn btn-primary" onclick="showView(\'my-apps\')"><i class="fa-solid fa-list-check"></i> View My Applications</button>' +
-    '</div>'
-  setTimeout(() => { showView('my-apps') }, 4000)
+  const refId = data && data.id ? data.id.slice(0,8).toUpperCase() : 'SUBMITTED'
+  showSuccessScreen(refId)
+  setTimeout(function() { showView('my-apps') }, 4000)
+}
+
+function showSuccessScreen(refId) {
+  var formArea = document.getElementById('view-apply-leave')
+  var div = document.createElement('div')
+  div.className = 'success-screen'
+  div.innerHTML = [
+    '<div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>',
+    '<h2 style="font-size:1.3rem;font-weight:800;color:var(--gray-900);margin-bottom:8px;">Application Submitted!</h2>',
+    '<p style="color:var(--gray-500);margin-bottom:6px;">Your leave application has been submitted successfully.</p>',
+    '<p style="color:var(--gray-500);font-size:0.85rem;margin-bottom:20px;">Reference: <strong style="color:var(--primary);">#' + refId + '</strong></p>',
+    '<p style="color:var(--gray-400);font-size:0.82rem;margin-bottom:24px;">Your manager has been notified and will review shortly.</p>',
+    '<button class="btn btn-primary" id="view-apps-btn"><i class="fa-solid fa-list-check"></i> View My Applications</button>'
+  ].join('')
+  formArea.innerHTML = ''
+  formArea.appendChild(div)
+  document.getElementById('view-apps-btn').addEventListener('click', function() {
+    showView('my-apps')
+  })
 }
 
 // -- MANAGER TABLE ---------------------------------------------
@@ -1960,30 +2027,40 @@ let appInitialised = false
 
 async function bootApp() {
   try {
-    // First try to get session with a timeout for slow mobile connections
-    const sessionPromise = sb.auth.getSession()
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('timeout')), 8000)
-    )
-    
-    let session = null
-    try {
-      const result = await Promise.race([sessionPromise, timeoutPromise])
-      session = result.data?.session
-    } catch(e) {
-      if (e.message === 'timeout') {
-        // On timeout, retry once more
-        console.log('Session fetch timed out, retrying...')
-        try {
-          const retry = await sb.auth.getSession()
-          session = retry.data?.session
-        } catch(retryErr) {
-          console.error('Retry failed:', retryErr)
-        }
+    // Check localStorage for cached session first - instant on mobile
+    const cachedUser = localStorage.getItem('nexahr_user')
+    if (cachedUser) {
+      try {
+        const user = JSON.parse(cachedUser)
+        // Show app immediately with cached data
+        await initApp(user)
+        hideLoading()
+        // Then silently verify session in background
+        sb.auth.getSession().then(async ({ data: { session } }) => {
+          if (!session) {
+            // Session expired - force logout
+            localStorage.removeItem('nexahr_user')
+            await sb.auth.signOut()
+            location.reload()
+          }
+        }).catch(() => {})
+        return
+      } catch(e) {
+        localStorage.removeItem('nexahr_user')
       }
     }
 
+    // No cache - fetch from Supabase with 10s timeout
+    const sessionPromise = sb.auth.getSession()
+    const timeoutPromise = new Promise((resolve) =>
+      setTimeout(() => resolve({ data: { session: null }, timedOut: true }), 10000)
+    )
+
+    const result = await Promise.race([sessionPromise, timeoutPromise])
+    const session = result.data?.session
+
     if (session && session.user) {
+      localStorage.setItem('nexahr_user', JSON.stringify(session.user))
       await initApp(session.user)
     } else {
       document.getElementById('auth-page').classList.remove('hidden')
@@ -2010,6 +2087,104 @@ sb.auth.onAuthStateChange(async (event, session) => {
     hideLoading()
   }
 })
+
+// -- RESET LEAVE BALANCES --
+window.toggleResetEmployee = function() {
+  var scope = document.getElementById('reset-scope').value
+  var empSelect = document.getElementById('reset-employee-select')
+  if (scope === 'single') {
+    empSelect.classList.remove('hidden')
+    loadEmployeesForReset()
+  } else {
+    empSelect.classList.add('hidden')
+  }
+}
+
+async function loadEmployeesForReset() {
+  var sel = document.getElementById('reset-employee-id')
+  sel.innerHTML = '<option value="">Loading...</option>'
+  var { data } = await sb.from('profiles').select('id, full_name').order('full_name')
+  if (data) {
+    sel.innerHTML = '<option value="">Select an employee...</option>' +
+      data.map(function(p) {
+        return '<option value="' + p.id + '">' + (p.full_name || 'Unknown') + '</option>'
+      }).join('')
+  }
+}
+
+window.resetLeaveBalance = async function() {
+  var leaveType = document.getElementById('reset-leave-type').value
+  var scope = document.getElementById('reset-scope').value
+  var employeeId = scope === 'single' ? document.getElementById('reset-employee-id').value : null
+
+  if (scope === 'single' && !employeeId) {
+    return toast('Please select an employee.', 'error')
+  }
+
+  // Confirm action
+  if (!confirm('Are you sure you want to reset ' + leaveType + ' for ' + (scope === 'all' ? 'ALL employees' : 'this employee') + '? This cannot be undone.')) {
+    return
+  }
+
+  try {
+    // Get all approved applications for this leave type
+    var query = sb.from('leave_applications')
+      .select('id, employee_id, working_days')
+      .eq('leave_type', leaveType)
+      .eq('status', 'approved')
+
+    if (scope === 'single') {
+      query = query.eq('employee_id', employeeId)
+    }
+
+    var { data: apps } = await query
+
+    if (!apps || apps.length === 0) {
+      toast('No approved ' + leaveType + ' applications found to reset.', 'info')
+      return
+    }
+
+    // Cancel all found applications to reset the balance
+    var ids = apps.map(function(a) { return a.id })
+    await sb.from('leave_applications')
+      .update({ status: 'cancelled' })
+      .in('id', ids)
+
+    // Log reset in history
+    var history = JSON.parse(localStorage.getItem('nexahr_reset_history') || '[]')
+    history.unshift({
+      date: new Date().toLocaleDateString('en-ZA'),
+      leaveType: leaveType,
+      scope: scope === 'all' ? 'All employees' : 'Single employee',
+      count: apps.length,
+      resetBy: cp?.full_name || 'Manager'
+    })
+    localStorage.setItem('nexahr_reset_history', JSON.stringify(history.slice(0, 20)))
+
+    await loadAllApps()
+    renderResetHistory()
+    toast(leaveType + ' balance reset successfully for ' + apps.length + ' application(s).', 'success')
+
+  } catch(err) {
+    toast('Reset failed: ' + err.message, 'error')
+  }
+}
+
+function renderResetHistory() {
+  var history = JSON.parse(localStorage.getItem('nexahr_reset_history') || '[]')
+  var el = document.getElementById('reset-history-list')
+  if (!el) return
+  if (history.length === 0) {
+    el.innerHTML = '<p style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:20px;">No resets recorded yet.</p>'
+    return
+  }
+  el.innerHTML = history.map(function(h) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100);font-size:0.85rem;">' +
+      '<div><strong>' + h.leaveType + '</strong> <span style="color:var(--gray-500);">-- ' + h.scope + '</span></div>' +
+      '<div style="color:var(--gray-400);font-size:0.78rem;">' + h.date + ' by ' + h.resetBy + '</div>' +
+    '</div>'
+  }).join('')
+}
 
 // Boot the app on page load
 bootApp()

@@ -492,6 +492,11 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
       <div id="mgr-nav" class="hidden">
         <div class="nav-section">Management</div>
         <a class="nav-item" onclick="showView('mgr-dash')"><i class="fa-solid fa-people-roof"></i> Team Requests</a>
+        <a class="nav-item" onclick="showView('reset-leave')"><i class="fa-solid fa-rotate-left"></i> Reset Balances</a>
+      </div>
+      <div id="admin-nav" class="hidden">
+        <div class="nav-section">Admin</div>
+        <a class="nav-item" onclick="showView('manage-team')"><i class="fa-solid fa-users-gear"></i> Manage Team</a>
       </div>
     </nav>
     <div class="sb-bottom">
@@ -639,26 +644,29 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
         </div>
         <div class="form-paper" id="printable">
           <div class="off-header">
-            <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;">
-              <div style="width:32px;height:32px;background:linear-gradient(135deg,#0ea5e9,#1a56db);border-radius:8px;display:flex;align-items:center;justify-content:center;">
-                <svg width="18" height="18" viewBox="0 0 22 22" fill="none"><path d="M3 6h6v10H3V6zm10-3h6v13h-6V3z" fill="white" opacity="0.9"/><path d="M7 11h8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+            <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;">
+              <div style="width:44px;height:44px;background:linear-gradient(135deg,#0ea5e9,#1a56db);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                <svg width="24" height="24" viewBox="0 0 22 22" fill="none"><path d="M3 6h6v10H3V6zm10-3h6v13h-6V3z" fill="white" opacity="0.9"/><path d="M7 11h8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
               </div>
-              <span style="font-size:1.3rem;font-weight:800;color:#0f172a;">NexaHR</span>
+              <div style="text-align:left;">
+                <div style="font-size:1.5rem;font-weight:800;color:#1a56db;letter-spacing:-0.5px;line-height:1.1;">NexaHR</div>
+                <div style="font-size:0.72rem;color:#6b7280;font-weight:500;">Smart HR Management for South Africa</div>
+              </div>
             </div>
-            <h1>Application for Leave of Absence</h1>
+            <h1>Leave of Absence Application</h1>
             <div class="dept" id="form-company-name">Leave Application Form</div>
-            <div class="prov">In terms of the Basic Conditions of Employment Act 75 of 1997</div>
+            <div class="prov">In compliance with the Basic Conditions of Employment Act 75 of 1997 (BCEA)</div>
           </div>
           <div class="sec-head" style="margin-top:0;"><i class="fa-solid fa-user"></i>&nbsp; Personal Details</div>
           <div class="form-row">
             <div class="form-group"><label>Surname *</label><input type="text" id="f-surname" required></div>
             <div class="form-group"><label>Initials *</label><input type="text" id="f-initials" required></div>
-            <div class="form-group"><label>PERSAL Number *</label><input type="text" id="f-persal" required></div>
+            <div class="form-group"><label>Employee / Staff ID</label><input type="text" id="f-persal" placeholder="Optional"></div>
           </div>
           <div class="form-row">
             <div class="form-group"><label>Email Address</label><input type="text" id="f-email" readonly style="background:#f0f0f0;"></div>
             <div class="form-group"><label>Telephone / Cell</label><input type="text" id="f-tel"></div>
-            <div class="form-group"><label>Department</label><input type="text" id="f-dept" readonly style="background:#f0f0f0;"></div>
+            <div class="form-group"><label>Department / Division</label><input type="text" id="f-dept" placeholder="e.g. Finance, HR, Operations"></div>
           </div>
           <div class="form-row">
             <div class="form-group"><label>Component / Office</label><input type="text" id="f-comp"></div>
@@ -827,6 +835,50 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
           </div>
         </div>
 
+      </section>
+
+      <!-- MANAGE TEAM -->
+      <section id="view-manage-team" class="app-view hidden">
+        <div class="pg-title">Manage Team</div>
+        <div class="pg-sub">Promote or demote team members — changes take effect immediately</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div>
+              <p style="font-size:0.95rem;font-weight:700;color:var(--gray-900);margin:0;">Team Members</p>
+              <p style="font-size:0.8rem;color:var(--gray-500);margin:0;">Use the dropdown to change a member's role</p>
+            </div>
+            <div style="background:var(--primary-light);border-radius:var(--radius-sm);padding:6px 14px;">
+              <span style="font-size:0.78rem;color:var(--primary);font-weight:600;" id="team-count">Loading...</span>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table id="team-table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Department</th>
+                  <th>Current Role</th>
+                  <th>Change Role</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="team-tbody">
+                <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray-400);">Loading team members...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card" style="background:#eff6ff;border:1px solid #bfdbfe;margin-top:0;">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <i class="fa-solid fa-circle-info" style="color:var(--primary);margin-top:2px;flex-shrink:0;"></i>
+            <div>
+              <p style="font-size:0.85rem;font-weight:600;color:var(--primary);margin:0 0 6px;">Role Permissions</p>
+              <p style="font-size:0.82rem;color:#1e40af;margin:0 0 3px;"><strong>Employee</strong> — Submit and track their own leave applications</p>
+              <p style="font-size:0.82rem;color:#1e40af;margin:0 0 3px;"><strong>Manager</strong> — Approve/reject leave, access Policy Generator and Reset Balances</p>
+              <p style="font-size:0.82rem;color:#1e40af;margin:0;"><strong>HR Admin</strong> — Full access including Manage Team. Can change any user's role</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- RESET LEAVE BALANCES -->
@@ -1133,6 +1185,9 @@ async function initApp(user) {
     document.getElementById('mgr-nav').classList.remove('hidden')
     document.getElementById('tools-nav').classList.remove('hidden')
   }
+  if (cp?.role === 'hr_admin') {
+    document.getElementById('admin-nav').classList.remove('hidden')
+  }
   document.getElementById('auth-page').classList.add('hidden')
   document.getElementById('main-app').classList.remove('hidden')
   await loadAllApps()
@@ -1161,6 +1216,7 @@ window.showView = async (v) => {
   if (v==='my-apps') { await loadAllApps(); renderHist(); clearNotifBadge() }
   if (v==='mgr-dash') { await loadAllApps(); renderMgr() }
   if (v==='reset-leave') { renderResetHistory(); document.getElementById('reset-scope').value='all'; document.getElementById('reset-employee-select').classList.add('hidden') }
+  if (v==='manage-team') { loadTeam() }
   if (v==='calendar') { await loadAllApps(); renderCalendar() }
   if (v==='profile') renderProfile()
   if (v==='apply-leave') {
@@ -2184,6 +2240,94 @@ function renderResetHistory() {
       '<div style="color:var(--gray-400);font-size:0.78rem;">' + h.date + ' by ' + h.resetBy + '</div>' +
     '</div>'
   }).join('')
+}
+
+// -- MANAGE TEAM --
+async function loadTeam() {
+  var tbody = document.getElementById('team-tbody')
+  var countEl = document.getElementById('team-count')
+  if (!tbody) return
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>'
+
+  try {
+    var res = await sb.from('profiles').select('id, full_name, department, role').order('full_name')
+    var profiles = res.data || []
+    if (countEl) countEl.textContent = profiles.length + ' member' + (profiles.length !== 1 ? 's' : '')
+
+    if (profiles.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);">No team members found.</td></tr>'
+      return
+    }
+
+    var roleBadge = {
+      employee: 'background:#f3f4f6;color:#374151;',
+      manager: 'background:#dbeafe;color:#1e40af;',
+      hr_admin: 'background:#dcfce7;color:#166534;'
+    }
+    var roleLabel = { employee: 'Employee', manager: 'Manager', hr_admin: 'HR Admin' }
+
+    var rows = profiles.map(function(p) {
+      var isMe = p.id === cu.id
+      var badge = roleBadge[p.role] || roleBadge.employee
+      var label = roleLabel[p.role] || p.role
+      var nameInit = (p.full_name || 'U').charAt(0).toUpperCase()
+      var nameTxt = (p.full_name || 'Unknown') + (isMe ? ' (you)' : '')
+      var deptTxt = p.department || 'Not set'
+
+      var roleDropdown = isMe
+        ? '<span style="color:var(--gray-400);font-size:0.78rem;font-style:italic;">Cannot change own role</span>'
+        : '<select data-pid="' + p.id + '" class="role-select" style="padding:6px 10px;border:1.5px solid var(--gray-300);border-radius:6px;font-size:0.8rem;outline:none;cursor:pointer;background:white;">'
+          + '<option value="employee"' + (p.role === 'employee' ? ' selected' : '') + '>Employee</option>'
+          + '<option value="manager"' + (p.role === 'manager' ? ' selected' : '') + '>Manager</option>'
+          + '<option value="hr_admin"' + (p.role === 'hr_admin' ? ' selected' : '') + '>HR Admin</option>'
+          + '</select>'
+
+      return '<tr>'
+        + '<td><div style="display:flex;align-items:center;gap:10px;">'
+        + '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#1a56db);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.8rem;flex-shrink:0;">' + nameInit + '</div>'
+        + '<span style="font-weight:600;font-size:0.85rem;">' + nameTxt + '</span>'
+        + '</div></td>'
+        + '<td style="color:var(--gray-500);font-size:0.83rem;">' + deptTxt + '</td>'
+        + '<td><span style="padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;' + badge + '">' + label + '</span></td>'
+        + '<td>' + roleDropdown + '</td>'
+        + '<td id="rstatus-' + p.id + '" style="font-size:0.78rem;color:var(--gray-400);min-width:80px;"></td>'
+        + '</tr>'
+    })
+
+    tbody.innerHTML = rows.join('')
+    // Attach change events after rendering
+    document.querySelectorAll('.role-select').forEach(function(sel) {
+      sel.addEventListener('change', function() {
+        updateRole(this.getAttribute('data-pid'), this.value, this)
+      })
+    })
+  } catch(err) {
+    toast('Error loading team: ' + err.message, 'error')
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#ef4444;">Error loading team. Please try again.</td></tr>'
+  }
+}
+
+window.updateRole = async function(profileId, newRole, selectEl) {
+  var statusEl = document.getElementById('rstatus-' + profileId)
+  if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--primary);"></i>'
+  if (selectEl) selectEl.disabled = true
+
+  var res = await sb.from('profiles').update({ role: newRole }).eq('id', profileId)
+
+  if (selectEl) selectEl.disabled = false
+
+  if (res.error) {
+    toast('Update failed: ' + res.error.message, 'error')
+    if (statusEl) statusEl.innerHTML = '<span style="color:#ef4444;"><i class="fa-solid fa-xmark"></i> Failed</span>'
+    return
+  }
+
+  var roleLabel = { employee: 'Employee', manager: 'Manager', hr_admin: 'HR Admin' }
+  if (statusEl) {
+    statusEl.innerHTML = '<span style="color:#059669;"><i class="fa-solid fa-circle-check"></i> Saved</span>'
+    setTimeout(function() { if (statusEl) statusEl.innerHTML = '' }, 3000)
+  }
+  toast('Role updated to ' + (roleLabel[newRole] || newRole) + ' successfully!', 'success')
 }
 
 // Boot the app on page load

@@ -426,6 +426,7 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
       </form>
       <form id="register-form" class="hidden" onsubmit="doRegister(event)">
         <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="John Doe" required></div>
+        <div class="form-group"><label>Company Name *</label><input type="text" id="reg-company" placeholder="e.g. Acme Trading, Public Works" required></div>
         <div class="form-group"><label>Work Email Address</label><input type="email" id="reg-email" placeholder="john.doe@yourcompany.co.za" required></div>
         <div class="form-row">
           <div class="form-group"><label>Password</label>
@@ -477,6 +478,7 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
       <div>
         <div class="sb-logo-text">NexaHR</div>
         <div class="sb-logo-sub">Smart HR Management</div>
+        <div id="sb-company-name" style="font-size:0.65rem;color:rgba(255,255,255,0.5);font-weight:500;margin-top:2px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
       </div>
     </div>
     <nav class="nav-menu">
@@ -529,7 +531,7 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
         <div style="background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:var(--radius);padding:24px 28px;margin-bottom:24px;color:white;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
           <div>
             <div style="font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;" id="dash-greeting">Good morning</div>
-            <div style="font-size:0.85rem;opacity:0.85;margin-top:4px;">Here is your HR workspace overview for today</div>
+            <div style="font-size:0.85rem;opacity:0.85;margin-top:4px;" id="dash-company-sub">Here is your HR workspace overview for today</div>
           </div>
           <button class="btn" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(4px);" onclick="showView('apply-leave')">
             <i class="fa-solid fa-plus"></i> New Leave Application
@@ -1074,20 +1076,36 @@ window.doLogin = async (e) => {
 window.doRegister = async (e) => {
   e.preventDefault()
   const name = document.getElementById('reg-name').value.trim()
+  const company = document.getElementById('reg-company').value.trim()
   const email = document.getElementById('reg-email').value.trim()
   const pass = document.getElementById('reg-pass').value
   const confirm = document.getElementById('reg-confirm').value
-  const role = document.getElementById('reg-role').value
   const dept = document.getElementById('reg-dept').value.trim()
+
+  if (!company) return toast('Please enter your company name.', 'error')
   if (pass !== confirm) return toast('Passwords do not match.', 'error')
+
   const btn = document.getElementById('register-btn')
-  btn.disabled = true; btn.textContent = 'Creating account...'
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...'
+
   const { error } = await sb.auth.signUp({
     email, password: pass,
-    options: { data: { full_name: name, role, department: dept } }
+    options: {
+      data: {
+        full_name: name,
+        company_name: company,
+        department: dept,
+        role: 'employee'
+      }
+    }
   })
-  btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-check"></i> CREATE ACCOUNT'
+
+  btn.disabled = false
+  btn.innerHTML = '<i class="fa-solid fa-user-check"></i> CREATE ACCOUNT'
+
   if (error) return toast(error.message, 'error')
+
   toast('Account created! Check your email to confirm, then log in.', 'success')
   window.switchAuth('login')
 }
@@ -1158,7 +1176,7 @@ async function initApp(user) {
   document.getElementById('auth-page').classList.add('hidden')
 
   // Load or create profile
-  let { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single()
+  let { data: profile } = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
   if (!profile) {
     await sb.from('profiles').upsert({
       id: user.id,
@@ -1180,6 +1198,11 @@ async function initApp(user) {
   if (avatarBig) {
     avatarBig.textContent = ini(displayName)
     avatarBig.className = 'profile-avatar-big avatar-color-' + colorIdx
+  }
+  // Show company name in sidebar
+  const companyEl = document.getElementById('sb-company-name')
+  if (companyEl && cp?.companies?.name) {
+    companyEl.textContent = cp.companies.name
   }
   if (cp?.role === 'manager' || cp?.role === 'hr_admin') {
     document.getElementById('mgr-nav').classList.remove('hidden')
@@ -1246,6 +1269,10 @@ function renderDash() {
   const name = cp?.full_name?.split(' ')[0] || 'there'
   const greetEl = document.getElementById('dash-greeting')
   if (greetEl) greetEl.textContent = greeting + ', ' + name
+  const subEl = document.getElementById('dash-company-sub')
+  if (subEl && cp?.companies?.name) {
+    subEl.textContent = cp.companies.name + ' — Leave Management'
+  }
   document.getElementById('st-total').textContent = my.length
   document.getElementById('st-pending').textContent = my.filter(a=>a.status==='pending').length
   document.getElementById('st-approved').textContent = my.filter(a=>a.status==='approved').length
@@ -1481,7 +1508,8 @@ function renderProfile() {
   const name = cp?.full_name || cu?.email || ''
   document.getElementById('prof-avatar-big').textContent = ini(name)
   document.getElementById('prof-name').textContent = name
-  document.getElementById('prof-role').textContent = `${cp?.role||'employee'} -- ${cp?.department||''}`
+  const companyName = cp?.companies?.name || ''
+  document.getElementById('prof-role').textContent = (cp?.role||'employee') + (companyName ? ' -- ' + companyName : '')
   document.getElementById('prof-name-input').value = name
   document.getElementById('prof-email-input').value = cu?.email || ''
   document.getElementById('prof-dept-input').value = cp?.department || ''

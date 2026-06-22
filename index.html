@@ -144,6 +144,7 @@ tbody tr:hover{background:#eff6ff;}
 td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;color:var(--gray-700);vertical-align:middle;}
 .badge{padding:4px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;color:white;display:inline-block;}
 .badge-pending{background:#f59e0b;}
+.badge-manager_approved{background:#3b82f6;}
 .badge-approved{background:#10b981;}
 .badge-rejected{background:#ef4444;}
 .badge-cancelled{background:#9ca3af;}
@@ -437,10 +438,10 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
           </div>
         </div>
         <div class="form-group" style="display:none;"><label>Role</label>
-          <select id="reg-role"><option value="employee">Employee</option><option value="manager">Manager</option><option value="hr_admin">HR Admin</option></select>
+          <select id="reg-role"><option value="employee">Employee</option><option value="manager">Manager</option><option value="admin">Admin</option></select>
         </div>
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:0.78rem;color:#1e40af;margin-bottom:14px;">
-          <i class="fa-solid fa-circle-info"></i> All new accounts are created as <strong>Employee</strong>. Contact your HR Admin to be upgraded to Manager or HR Admin.
+          <i class="fa-solid fa-circle-info"></i> All new accounts are created as <strong>Employee</strong>. Contact your Admin to be upgraded to Manager or Admin.
         </div>
         <div class="form-group"><label>Department</label><input type="text" id="reg-dept" placeholder="e.g. Finance, HR, Operations"></div>
         <button type="submit" id="register-btn" class="btn btn-gold" style="width:100%;justify-content:center;"><i class="fa-solid fa-user-check"></i> CREATE ACCOUNT</button>
@@ -706,7 +707,8 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
         <div class="pg-sub">Review, approve or reject employee leave requests</div>
         <div class="stats-grid">
           <div class="stat-card" style="border-color:#ff9800"><div><div class="stat-label">Pending</div><div class="stat-val" style="color:#f57f17" id="mgr-p">0</div></div><div class="si si-a"><i class="fa-solid fa-hourglass-half"></i></div></div>
-          <div class="stat-card" style="border-color:#4caf50"><div><div class="stat-label">Approved</div><div class="stat-val" style="color:#2e7d32" id="mgr-a">0</div></div><div class="si si-b"><i class="fa-solid fa-circle-check"></i></div></div>
+          <div class="stat-card" style="border-color:#3b82f6"><div><div class="stat-label">Mgr Approved</div><div class="stat-val" style="color:#3b82f6" id="mgr-ma">0</div></div><div class="si" style="background:#dbeafe;color:#3b82f6;"><i class="fa-solid fa-user-check"></i></div></div>
+          <div class="stat-card" style="border-color:#4caf50"><div><div class="stat-label">Fully Approved</div><div class="stat-val" style="color:#2e7d32" id="mgr-a">0</div></div><div class="si si-b"><i class="fa-solid fa-circle-check"></i></div></div>
           <div class="stat-card" style="border-color:#f44336"><div><div class="stat-label">Rejected</div><div class="stat-val" style="color:#c62828" id="mgr-r">0</div></div><div class="si si-r"><i class="fa-solid fa-circle-xmark"></i></div></div>
           <div class="stat-card" style="border-color:#9e9e9e"><div><div class="stat-label">Cancelled</div><div class="stat-val" style="color:#757575" id="mgr-c">0</div></div><div class="si" style="background:#f5f5f5;color:#757575;"><i class="fa-solid fa-ban"></i></div></div>
         </div>
@@ -714,7 +716,8 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
           <div style="padding:16px 20px;border-bottom:1px solid #eee;display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-sm" style="background:#f5f5f5;color:#333;" onclick="filterMgr('all')">All</button>
             <button class="btn btn-sm btn-warning" onclick="filterMgr('pending')">Pending</button>
-            <button class="btn btn-sm btn-primary" onclick="filterMgr('approved')">Approved</button>
+            <button class="btn btn-sm" style="background:#3b82f6;color:white;" onclick="filterMgr('manager_approved')">Mgr Approved</button>
+            <button class="btn btn-sm btn-primary" onclick="filterMgr('approved')">Fully Approved</button>
             <button class="btn btn-sm btn-danger" onclick="filterMgr('rejected')">Rejected</button>
           </div>
           <div class="tbl-wrap"><table id="mgr-tbl"><thead><tr><th>Employee</th><th>Leave Type</th><th>Start Date</th><th>Days</th><th>Applied On</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
@@ -877,7 +880,7 @@ td{padding:12px 16px;border-bottom:1px solid var(--gray-100);font-size:0.85rem;c
               <p style="font-size:0.85rem;font-weight:600;color:var(--primary);margin:0 0 6px;">Role Permissions</p>
               <p style="font-size:0.82rem;color:#1e40af;margin:0 0 3px;"><strong>Employee</strong> — Submit and track their own leave applications</p>
               <p style="font-size:0.82rem;color:#1e40af;margin:0 0 3px;"><strong>Manager</strong> — Approve/reject leave, access Policy Generator and Reset Balances</p>
-              <p style="font-size:0.82rem;color:#1e40af;margin:0;"><strong>HR Admin</strong> — Full access including Manage Team. Can change any user's role</p>
+              <p style="font-size:0.82rem;color:#1e40af;margin:0;"><strong>Admin</strong> — Full access including Manage Team. Can change any user's role</p>
             </div>
           </div>
         </div>
@@ -1080,9 +1083,13 @@ window.doRegister = async (e) => {
   const email = document.getElementById('reg-email').value.trim()
   const pass = document.getElementById('reg-pass').value
   const confirm = document.getElementById('reg-confirm').value
-  const dept = document.getElementById('reg-dept').value.trim()
+  const deptEl = document.getElementById('reg-dept')
+  const dept = deptEl ? deptEl.value.trim() : ''
 
+  if (!name) return toast('Please enter your full name.', 'error')
   if (!company) return toast('Please enter your company name.', 'error')
+  if (!email) return toast('Please enter your email address.', 'error')
+  if (pass.length < 6) return toast('Password must be at least 6 characters.', 'error')
   if (pass !== confirm) return toast('Passwords do not match.', 'error')
 
   const btn = document.getElementById('register-btn')
@@ -1182,13 +1189,20 @@ async function initApp(user) {
       id: user.id,
       full_name: user.user_metadata?.full_name || user.email.split('@')[0],
       role: user.user_metadata?.role || 'employee',
-      department: user.user_metadata?.department || 'NexaHR and Infrastructure'
+      department: user.user_metadata?.department || ''
     })
-    const res = await sb.from('profiles').select('*').eq('id', user.id).single()
+    const res = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
     profile = res.data
+  } else if (!profile.full_name) {
+    const fixedName = user.user_metadata?.full_name || user.email.split('@')[0]
+    await sb.from('profiles').update({ full_name: fixedName }).eq('id', user.id)
+    profile.full_name = fixedName
   }
   cp = profile
-  const displayName = cp?.full_name || user.email
+  const displayName = cp?.full_name 
+    || cu?.user_metadata?.full_name 
+    || user.user_metadata?.full_name 
+    || user.email
   document.getElementById('user-name-display').textContent = displayName
   const avatarEl = document.getElementById('user-avatar')
   const avatarBig = document.getElementById('prof-avatar-big')
@@ -1204,11 +1218,11 @@ async function initApp(user) {
   if (companyEl && cp?.companies?.name) {
     companyEl.textContent = cp.companies.name
   }
-  if (cp?.role === 'manager' || cp?.role === 'hr_admin') {
+  if (cp?.role === 'manager' || cp?.role === 'admin') {
     document.getElementById('mgr-nav').classList.remove('hidden')
     document.getElementById('tools-nav').classList.remove('hidden')
   }
-  if (cp?.role === 'hr_admin') {
+  if (cp?.role === 'admin') {
     document.getElementById('admin-nav').classList.remove('hidden')
   }
   document.getElementById('auth-page').classList.add('hidden')
@@ -1266,7 +1280,12 @@ function renderDash() {
   // Update greeting
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-  const name = cp?.full_name?.split(' ')[0] || 'there'
+  // Try profile name first, then auth metadata, then email prefix
+  const rawName = cp?.full_name 
+    || cu?.user_metadata?.full_name 
+    || cu?.email?.split('@')[0] 
+    || 'there'
+  const name = rawName.split(' ')[0]
   const greetEl = document.getElementById('dash-greeting')
   if (greetEl) greetEl.textContent = greeting + ', ' + name
   const subEl = document.getElementById('dash-company-sub')
@@ -1297,7 +1316,7 @@ function renderDash() {
   tb.innerHTML = rc.length ? rc.map(a => `<tr>
     <td>${fmt(a.created_at)}</td><td>${a.leave_type}</td><td>${fmt(a.start_date)}</td>
     <td>${a.working_days}</td>
-    <td><span class="badge badge-${a.status}">${a.status.toUpperCase()}</span></td>
+    <td><span class="badge badge-${a.status}" style="${a.status==='manager_approved' ? 'background:#3b82f6;' : ''}">${a.status === 'manager_approved' ? 'MGR APPROVED' : a.status.toUpperCase()}</span></td>
     <td><button class="btn btn-primary btn-sm" onclick="viewApp('${a.id}')"><i class="fa-solid fa-eye"></i></button></td>
   </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray-500);font-size:0.9rem;"><i class=\"fa-regular fa-folder-open\" style=\"font-size:2rem;display:block;margin-bottom:10px;opacity:0.4;\"></i>No applications yet.<br><small style=\"color:var(--gray-300)\">Submit your first leave application to get started</small></td></tr>'
 }
@@ -1310,7 +1329,7 @@ function renderHist() {
     <td><strong style="color:var(--primary)">#${a.id.slice(0,8).toUpperCase()}</strong></td>
     <td>${fmt(a.created_at)}</td><td>${a.leave_type}</td>
     <td>${fmt(a.start_date)}</td><td>${a.working_days}</td>
-    <td><span class="badge badge-${a.status}">${a.status.toUpperCase()}</span></td>
+    <td><span class="badge badge-${a.status}" style="${a.status==='manager_approved' ? 'background:#3b82f6;' : ''}">${a.status === 'manager_approved' ? 'MGR APPROVED' : a.status.toUpperCase()}</span></td>
     <td style="display:flex;gap:5px;flex-wrap:wrap;">
       <button class="btn btn-primary btn-sm" onclick="viewApp('${a.id}')" data-tip="View details"><i class="fa-solid fa-eye"></i></button>
       ${a.status==='pending' ? `<button class="btn btn-danger btn-sm" onclick="askCancel('${a.id}')" data-tip="Cancel application"><i class="fa-solid fa-ban"></i></button>` : ''}
@@ -1394,6 +1413,7 @@ function showSuccessScreen(refId) {
 function renderMgr() {
   const filtered = mgrFilter==='all' ? allApps : allApps.filter(a => a.status===mgrFilter)
   document.getElementById('mgr-p').textContent = allApps.filter(a=>a.status==='pending').length
+  document.getElementById('mgr-ma').textContent = allApps.filter(a=>a.status==='manager_approved').length
   document.getElementById('mgr-a').textContent = allApps.filter(a=>a.status==='approved').length
   document.getElementById('mgr-r').textContent = allApps.filter(a=>a.status==='rejected').length
   document.getElementById('mgr-c').textContent = allApps.filter(a=>a.status==='cancelled').length
@@ -1402,10 +1422,13 @@ function renderMgr() {
     <td><strong>${a.profiles?.full_name||'Unknown'}</strong><br><small style="color:#999">${a.profiles?.department||''}</small></td>
     <td>${a.leave_type}</td><td>${fmt(a.start_date)}</td><td>${a.working_days}</td>
     <td>${fmt(a.created_at)}</td>
-    <td><span class="badge badge-${a.status}">${a.status.toUpperCase()}</span></td>
+    <td><span class="badge badge-${a.status}" style="${a.status==='manager_approved' ? 'background:#3b82f6;' : ''}">${a.status === 'manager_approved' ? 'MGR APPROVED' : a.status.toUpperCase()}</span></td>
     <td style="display:flex;gap:5px;flex-wrap:wrap;">
-      ${a.status==='pending' ? `
-        <button class="btn btn-primary btn-sm" onclick="setStatus('${a.id}','approved')" data-tip="Approve"><i class="fa-solid fa-check"></i></button>
+      ${a.status==='pending' && (cp?.role==='manager' || cp?.role==='admin') ? `
+        <button class="btn btn-primary btn-sm" onclick="setStatus('${a.id}','${cp?.role==='admin' ? 'approved' : 'manager_approved'}')" data-tip="${cp?.role==='admin' ? 'Final Approve' : 'Approve'}"><i class="fa-solid fa-check"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="askReject('${a.id}')" data-tip="Reject"><i class="fa-solid fa-xmark"></i></button>` : ''}
+      ${a.status==='manager_approved' && cp?.role==='admin' ? `
+        <button class="btn btn-primary btn-sm" onclick="setStatus('${a.id}','approved')" data-tip="Final Approve" style="background:#059669;"><i class="fa-solid fa-check-double"></i></button>
         <button class="btn btn-danger btn-sm" onclick="askReject('${a.id}')" data-tip="Reject"><i class="fa-solid fa-xmark"></i></button>` : ''}
       <button class="btn btn-sm" style="background:var(--gray-100);color:var(--gray-700)" onclick="viewApp('${a.id}')" data-tip="View details"><i class="fa-solid fa-eye"></i></button>
     </td>
@@ -1415,951 +1438,32 @@ window.filterMgr = (f) => { mgrFilter=f; renderMgr() }
 
 // -- UPDATE STATUS ---------------------------------------------
 window.setStatus = async (id, status, reason='') => {
-  const update = { status, approved_by: cu.id, approved_at: new Date().toISOString() }
-  if (reason) update.reason = reason
+  let update = {}
+  const now = new Date().toISOString()
+
+  if (status === 'manager_approved') {
+    update = { status: 'manager_approved', manager_approved_by: cu.id, manager_approved_at: now }
+  } else if (status === 'approved') {
+    update = { status: 'approved', approved_by: cu.id, approved_at: now }
+  } else if (status === 'rejected') {
+    update = { status: 'rejected', approved_by: cu.id, approved_at: now }
+    if (reason) update.reason = reason
+  }
+
   const { error } = await sb.from('leave_applications').update(update).eq('id', id)
   if (error) return toast('Update failed: ' + error.message, 'error')
-  toast(`Application ${status}!`, status==='approved' ? 'success' : 'warning')
-  // Notify employee by email
-  await notifyLeave(id, status)
+
+  if (status === 'manager_approved') {
+    toast('Forwarded to Admin for final approval!', 'success')
+    await notifyLeave(id, 'manager_approved')
+  } else if (status === 'approved') {
+    toast('Application fully approved!', 'success')
+    await notifyLeave(id, 'approved')
+  } else {
+    toast('Application rejected.', 'warning')
+    await notifyLeave(id, 'rejected')
+  }
+
   await loadAllApps()
   renderMgr()
 }
-
-// -- CANCEL ----------------------------------------------------
-window.askCancel = (id) => { cancelTargetId=id; document.getElementById('cancel-modal').classList.remove('hidden') }
-window.confirmCancel = async () => {
-  const { error } = await sb.from('leave_applications').update({ status:'cancelled' }).eq('id', cancelTargetId)
-  if (error) return toast(error.message, 'error')
-  toast('Application cancelled.', 'warning')
-  closeModal('cancel-modal')
-  await loadAllApps()
-  renderHist(); renderDash()
-}
-
-// -- REJECT ----------------------------------------------------
-window.askReject = (id) => { rejectTargetId=id; document.getElementById('reject-reason').value=''; document.getElementById('reject-modal').classList.remove('hidden') }
-window.confirmReject = async () => {
-  const reason = document.getElementById('reject-reason').value.trim()
-  if (!reason) return toast('Please provide a rejection reason.', 'error')
-  await setStatus(rejectTargetId, 'rejected', reason)
-  closeModal('reject-modal')
-}
-
-// -- VIEW APP MODAL --------------------------------------------
-window.viewApp = (id) => {
-  const a = allApps.find(x => x.id===id)
-  if (!a) return
-  document.getElementById('modal-body').innerHTML = `
-    <h2 style="color:var(--primary);margin-bottom:18px;font-size:1.1rem;"><i class="fa-solid fa-file-lines"></i> Application #${a.id.slice(0,8).toUpperCase()}</h2>
-    <div class="det-grid">
-      <div class="det-item"><strong>Employee</strong>${a.profiles?.full_name||'Unknown'}</div>
-      <div class="det-item"><strong>Leave Type</strong>${a.leave_type}</div>
-      <div class="det-item"><strong>Start Date</strong>${fmt(a.start_date)}</div>
-      <div class="det-item"><strong>End Date</strong>${fmt(a.end_date)}</div>
-      <div class="det-item"><strong>Working Days</strong>${a.working_days}</div>
-      <div class="det-item"><strong>Applied On</strong>${fmt(a.created_at)}</div>
-      <div class="det-item"><strong>Status</strong><span class="badge badge-${a.status}">${a.status.toUpperCase()}</span></div>
-      ${a.reason ? `<div class="det-item" style="grid-column:span 2"><strong>Notes</strong>${a.reason}</div>` : ''}
-    </div>
-    <div style="border-top:1px solid #eee;padding-top:14px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
-      ${a.status==='pending'&&a.employee_id===cu?.id ? `<button class="btn btn-danger btn-sm" onclick="closeModal('modal');askCancel('${a.id}')"><i class="fa-solid fa-ban"></i> Cancel</button>` : ''}
-      <button class="btn btn-sm" style="background:#e0e0e0;color:#333" onclick="closeModal('modal')">Close</button>
-    </div>`
-  document.getElementById('modal').classList.remove('hidden')
-}
-
-// -- CALENDAR --------------------------------------------------
-function renderCalendar() {
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
-  const y = calDate.getFullYear(), m = calDate.getMonth()
-  document.getElementById('cal-month-title').textContent = `${months[m]} ${y}`
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-  let html = days.map(d=>`<div class="cal-day-name">${d}</div>`).join('')
-  const first = new Date(y,m,1).getDay()
-  const last = new Date(y,m+1,0).getDate()
-  const prevLast = new Date(y,m,0).getDate()
-  const today = new Date()
-  const monthApps = allApps.filter(a => {
-    if (!a.start_date) return false
-    const d = new Date(a.start_date)
-    return d.getFullYear()===y && d.getMonth()===m
-  })
-  for(let i=first-1;i>=0;i--) html+=`<div class="cal-day other-month"><div class="day-num">${prevLast-i}</div></div>`
-  for(let d=1;d<=last;d++) {
-    const isToday = today.getDate()===d && today.getMonth()===m && today.getFullYear()===y
-    const dayApps = monthApps.filter(a => new Date(a.start_date).getDate()===d)
-    html += `<div class="cal-day${isToday?' today':''}${dayApps.length?' has-leave':''}">
-      <div class="day-num">${d}</div>
-      ${dayApps.map(a=>`<div class="cal-event ${a.status}" title="${a.profiles?.full_name} - ${a.leave_type}">${(a.profiles?.full_name||'?').split(' ')[0]}</div>`).join('')}
-    </div>`
-  }
-  const rem = (first+last)%7===0?0:7-((first+last)%7)
-  for(let i=1;i<=rem;i++) html+=`<div class="cal-day other-month"><div class="day-num">${i}</div></div>`
-  document.getElementById('cal-grid').innerHTML = html
-}
-window.changeMonth = (dir) => {
-  calDate = dir===0 ? new Date() : new Date(calDate.getFullYear(), calDate.getMonth()+dir, 1)
-  renderCalendar()
-}
-
-// -- PROFILE ---------------------------------------------------
-function renderProfile() {
-  const name = cp?.full_name || cu?.email || ''
-  document.getElementById('prof-avatar-big').textContent = ini(name)
-  document.getElementById('prof-name').textContent = name
-  const companyName = cp?.companies?.name || ''
-  document.getElementById('prof-role').textContent = (cp?.role||'employee') + (companyName ? ' -- ' + companyName : '')
-  document.getElementById('prof-name-input').value = name
-  document.getElementById('prof-email-input').value = cu?.email || ''
-  document.getElementById('prof-dept-input').value = cp?.department || ''
-  document.getElementById('prof-role-input').value = cp?.role || ''
-  const usedMap = {}
-  myApps().filter(a=>a.status==='approved').forEach(a => {
-    usedMap[a.leave_type] = (usedMap[a.leave_type]||0) + (a.working_days||0)
-  })
-  document.getElementById('prof-balance-grid').innerHTML = Object.entries(LEAVE_BALANCES).map(([type,total]) => {
-    const used=usedMap[type]||0, rem=Math.max(0,total-used)
-    const pct = Math.round((used/total)*100)
-    const barColor = pct > 80 ? '#ef4444' : pct > 50 ? '#f59e0b' : '#10b981'
-    return '<div class="balance-card">' +
-      '<div class="days">' + rem + '</div>' +
-      '<div class="type">' + type + '</div>' +
-      '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
-      '<div class="used">' + used + ' used of ' + total + ' days</div>' +
-    '</div>'
-  }).join('')
-}
-window.saveProfile = async () => {
-  const newName = document.getElementById('prof-name-input').value.trim()
-  if (!newName) return toast('Name cannot be empty.', 'error')
-  const { error } = await sb.from('profiles').update({ full_name: newName }).eq('id', cu.id)
-  if (error) return toast(error.message, 'error')
-  cp.full_name = newName
-  document.getElementById('user-name-display').textContent = newName
-  document.getElementById('user-avatar').textContent = ini(newName)
-  renderProfile()
-  toast('Profile updated!', 'success')
-}
-window.changePassword = async () => {
-  const nw = document.getElementById('pw-new').value
-  const cf = document.getElementById('pw-confirm').value
-  if (!nw||!cf) return toast('Please fill both password fields.', 'error')
-  if (nw!==cf) return toast('Passwords do not match.', 'error')
-  if (nw.length<6) return toast('Password must be at least 6 characters.', 'error')
-  const { error } = await sb.auth.updateUser({ password: nw })
-  if (error) return toast(error.message, 'error')
-  document.getElementById('pw-new').value=''
-  document.getElementById('pw-confirm').value=''
-  toast('Password updated!', 'success')
-}
-
-function updateNotifBadge() {
-  // Only show badge for apps updated SINCE last viewed
-  const lastViewed = parseInt(localStorage.getItem('nexahr_last_viewed') || '0')
-  const n = myApps().filter(a => {
-    if (a.status !== 'approved' && a.status !== 'rejected') return false
-    const updatedAt = new Date(a.approved_at || a.created_at).getTime()
-    return updatedAt > lastViewed
-  }).length
-  const badge = document.getElementById('notif-count')
-  badge.textContent = n
-  badge.classList.toggle('hidden', n === 0)
-}
-
-function clearNotifBadge() {
-  localStorage.setItem('nexahr_last_viewed', Date.now().toString())
-  const badge = document.getElementById('notif-count')
-  badge.textContent = '0'
-  badge.classList.add('hidden')
-}
-
-// -- AUTH STATE LISTENER ---------------------------------------
-// -- POLICY GENERATOR --
-let selectedPolicyType = 'leave'
-let generatedPolicyText = ''
-
-window.selectPolicyType = function(type) {
-  selectedPolicyType = type
-  document.querySelectorAll('.policy-type-card').forEach(function(c) {
-    c.classList.remove('active-card')
-  })
-  document.getElementById('ptype-' + type).classList.add('active-card')
-  // Update step indicator
-  var s1 = document.getElementById('step1')
-  var l1 = document.getElementById('line1')
-  if (s1) { s1.className = 'step-item step-done' }
-  if (l1) { l1.className = 'step-line done' }
-}
-
-function buildLeavePolicy(company, industry, size, province, notes) {
-  var lines = []
-  lines.push(company.toUpperCase())
-  lines.push('LEAVE POLICY')
-  lines.push('In terms of the Basic Conditions of Employment Act 75 of 1997 (BCEA)')
-  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
-  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
-  lines.push('------------------------------------------------------------')
-  lines.push('')
-  lines.push('1. PURPOSE AND SCOPE')
-  lines.push('This Leave Policy applies to all employees of ' + company + ' and has been developed in')
-  lines.push('compliance with the Basic Conditions of Employment Act 75 of 1997, as amended.')
-  lines.push('')
-  lines.push('2. ANNUAL LEAVE')
-  lines.push('2.1 All employees are entitled to 21 consecutive days (15 working days) of paid annual leave per leave cycle.')
-  lines.push('2.2 A leave cycle is a period of 12 months from the first day of employment or anniversary thereof.')
-  lines.push('2.3 Annual leave must be taken at a time agreed upon between the employer and employee.')
-  lines.push('2.4 ' + company + ' may require an employee to take annual leave during or within 6 months after the leave cycle.')
-  lines.push('2.5 Annual leave may not be replaced by payment except upon termination of employment.')
-  lines.push('2.6 Leave not taken within 6 months after the leave cycle will be forfeited unless agreed in writing.')
-  lines.push('')
-  lines.push('3. SICK LEAVE')
-  lines.push('3.1 During every sick leave cycle of 36 months, an employee is entitled to paid sick leave')
-  lines.push('    equal to the number of days the employee would normally work during a period of 6 weeks.')
-  lines.push('3.2 During the first 6 months of employment, an employee is entitled to 1 day paid sick leave')
-  lines.push('    for every 26 days worked.')
-  lines.push('3.3 ' + company + ' may require a medical certificate if an employee is absent for more than')
-  lines.push('    2 consecutive days or on more than 2 occasions in an 8-week period.')
-  lines.push('3.4 A valid medical certificate must be issued by a registered medical practitioner.')
-  lines.push('')
-  lines.push('4. FAMILY RESPONSIBILITY LEAVE')
-  lines.push('4.1 Employees employed for longer than 4 months working more than 4 days per week')
-  lines.push('    are entitled to 3 days paid family responsibility leave per annual leave cycle.')
-  lines.push('4.2 Family responsibility leave may be taken when:')
-  lines.push('    a) The employee child is born')
-  lines.push('    b) The employee child is sick')
-  lines.push('    c) Death of spouse, life partner, parent, grandparent, child, grandchild or sibling')
-  lines.push('4.3 ' + company + ' may require reasonable proof of the event.')
-  lines.push('')
-  lines.push('5. MATERNITY LEAVE')
-  lines.push('5.1 A pregnant employee is entitled to at least 4 consecutive months maternity leave.')
-  lines.push('5.2 An employee may commence maternity leave from 4 weeks before the expected date of birth.')
-  lines.push('5.3 No employee may work for 6 weeks after birth unless a medical practitioner certifies fitness.')
-  lines.push('5.4 Maternity leave is unpaid unless otherwise agreed in the employment contract.')
-  lines.push('')
-  lines.push('6. PATERNITY/PARENTAL LEAVE')
-  lines.push('6.1 A parent is entitled to 10 consecutive days parental leave.')
-  lines.push('6.2 Parental leave commences on the day of the birth or adoption order.')
-  lines.push('')
-  lines.push('7. UNPAID LEAVE')
-  lines.push('7.1 Employees may apply for unpaid leave in exceptional circumstances.')
-  lines.push('7.2 Approval is at the sole discretion of management.')
-  lines.push('7.3 Applications must be submitted at least 10 working days in advance except in emergencies.')
-  lines.push('')
-  lines.push('8. LEAVE APPLICATION PROCEDURE')
-  lines.push('8.1 All leave applications must be submitted via the ' + company + ' Leave Management Portal')
-  lines.push('    prior to commencement of leave, except in cases of emergency.')
-  lines.push('8.2 The direct supervisor must approve all leave applications.')
-  lines.push('8.3 HR Administration must be notified of all approved leave.')
-  lines.push('8.4 Employees must ensure adequate handover before proceeding on leave.')
-  lines.push('')
-  lines.push('9. PUBLIC HOLIDAYS')
-  lines.push('9.1 Employees are entitled to all public holidays as gazetted in the Public Holidays Act 36 of 1994.')
-  lines.push('9.2 When a public holiday falls on a Sunday, the following Monday is observed.')
-  if (notes) {
-    lines.push('')
-    lines.push('10. ADDITIONAL PROVISIONS')
-    lines.push(notes)
-  }
-  lines.push('')
-  lines.push('------------------------------------------------------------')
-  lines.push('Approved by: _______________________    Date: _______________')
-  lines.push('HR Manager: ' + company)
-  return lines.join('\n')
-}
-
-function buildDisciplinaryCode(company, industry, size, province, notes) {
-  var lines = []
-  lines.push(company.toUpperCase())
-  lines.push('DISCIPLINARY CODE AND PROCEDURE')
-  lines.push('In terms of the Labour Relations Act 66 of 1995')
-  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
-  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
-  lines.push('------------------------------------------------------------')
-  lines.push('')
-  lines.push('1. PURPOSE')
-  lines.push(company + ' is committed to maintaining a productive and harmonious working environment.')
-  lines.push('This Code establishes fair standards of conduct in accordance with the LRA and CCMA Code of Good Practice.')
-  lines.push('')
-  lines.push('2. PRINCIPLES')
-  lines.push('2.1 Disciplinary action shall be corrective rather than punitive.')
-  lines.push('2.2 The principle of progressive discipline shall apply in most cases.')
-  lines.push('2.3 All employees have the right to be heard before any disciplinary action is taken.')
-  lines.push('2.4 No employee shall be dismissed without a fair reason and a fair procedure.')
-  lines.push('')
-  lines.push('3. CATEGORIES OF MISCONDUCT')
-  lines.push('')
-  lines.push('3.1 MINOR MISCONDUCT (First offence -- Verbal Warning)')
-  lines.push('    - Poor timekeeping or late arrivals')
-  lines.push('    - Unauthorised absence of 1 day')
-  lines.push('    - Failure to follow reasonable instructions')
-  lines.push('    - Minor negligence')
-  lines.push('')
-  lines.push('3.2 SERIOUS MISCONDUCT (First offence -- Written Warning)')
-  lines.push('    - Repeated minor misconduct')
-  lines.push('    - Unauthorised absence of 2-3 days')
-  lines.push('    - Disrespectful behaviour toward colleagues')
-  lines.push('    - Negligence resulting in minor loss or damage')
-  lines.push('')
-  lines.push('3.3 GROSS MISCONDUCT (May result in dismissal without prior warnings)')
-  lines.push('    - Theft or fraud of any nature')
-  lines.push('    - Assault or fighting in the workplace')
-  lines.push('    - Sexual harassment')
-  lines.push('    - Wilful damage to company property')
-  lines.push('    - Intoxication at work')
-  lines.push('    - Gross insubordination')
-  lines.push('    - Unauthorised absence of 5 or more consecutive days')
-  lines.push('    - Bribery or corruption')
-  lines.push('')
-  lines.push('4. PROGRESSIVE DISCIPLINE STEPS')
-  lines.push('Step 1: Verbal Warning (valid for 3 months)')
-  lines.push('Step 2: First Written Warning (valid for 6 months)')
-  lines.push('Step 3: Final Written Warning (valid for 12 months)')
-  lines.push('Step 4: Dismissal')
-  lines.push('')
-  lines.push('5. DISCIPLINARY HEARING PROCEDURE')
-  lines.push('5.1 The employee must receive written notice at least 48 hours before the hearing.')
-  lines.push('5.2 The notice must specify the date, time, venue, nature of charges, and right to representation.')
-  lines.push('5.3 The employee may be represented by a fellow employee or shop steward.')
-  lines.push('5.4 The employee must receive written notification of the outcome within 5 working days.')
-  lines.push('5.5 The employee has the right to appeal within 5 working days of the outcome.')
-  lines.push('')
-  lines.push('6. SUSPENSION PENDING INVESTIGATION')
-  lines.push('6.1 ' + company + ' may suspend an employee on full pay pending investigation.')
-  lines.push('6.2 Suspension is not a punitive measure.')
-  if (notes) {
-    lines.push('')
-    lines.push('7. ADDITIONAL PROVISIONS')
-    lines.push(notes)
-  }
-  lines.push('')
-  lines.push('------------------------------------------------------------')
-  lines.push('CCMA Contact: 0861 16 2622 | www.ccma.org.za')
-  lines.push('Approved by: _______________________    Date: _______________')
-  lines.push('HR Manager: ' + company)
-  return lines.join('\n')
-}
-
-function buildContract(company, industry, size, province, notes) {
-  var lines = []
-  lines.push(company.toUpperCase())
-  lines.push('STANDARD EMPLOYMENT CONTRACT')
-  lines.push('In terms of the Basic Conditions of Employment Act 75 of 1997')
-  lines.push('Province: ' + province + ' | Sector: ' + industry)
-  lines.push('------------------------------------------------------------')
-  lines.push('')
-  lines.push('EMPLOYER: ' + company)
-  lines.push('EMPLOYEE: _________________________')
-  lines.push('POSITION: _________________________')
-  lines.push('DEPARTMENT: _________________________')
-  lines.push('COMMENCEMENT DATE: _________________________')
-  lines.push('')
-  lines.push('1. NATURE OF EMPLOYMENT')
-  lines.push('1.1 This is a [permanent / fixed-term] contract of employment.')
-  lines.push('1.2 The first 3 months shall constitute a probationary period.')
-  lines.push('')
-  lines.push('2. REMUNERATION')
-  lines.push('2.1 The Employee shall be remunerated at R_______________ per month.')
-  lines.push('2.2 Salary shall be paid on the last working day of each month.')
-  lines.push('2.3 The employer shall deduct PAYE, UIF, and other statutory deductions as required by law.')
-  lines.push('')
-  lines.push('3. WORKING HOURS')
-  lines.push('3.1 Ordinary hours shall not exceed 45 hours per week or 9 hours per day.')
-  lines.push('3.2 Overtime shall be compensated at 1.5 times the ordinary rate on weekdays.')
-  lines.push('3.3 Overtime shall not exceed 10 hours per week.')
-  lines.push('')
-  lines.push('4. LEAVE ENTITLEMENTS')
-  lines.push('4.1 Annual Leave: 21 consecutive days (15 working days) per leave cycle.')
-  lines.push('4.2 Sick Leave: As per ' + company + ' Leave Policy and BCEA.')
-  lines.push('4.3 Family Responsibility Leave: 3 days per annual cycle.')
-  lines.push('4.4 Public Holidays: All gazetted public holidays.')
-  lines.push('')
-  lines.push('5. NOTICE PERIOD')
-  lines.push('5.1 Less than 6 months employment: 1 week notice')
-  lines.push('5.2 6 months to 1 year: 2 weeks notice')
-  lines.push('5.3 More than 1 year: 4 weeks notice')
-  lines.push('5.4 Notice must be given in writing.')
-  lines.push('')
-  lines.push('6. CONFIDENTIALITY')
-  lines.push('6.1 The Employee agrees to keep all business information strictly confidential.')
-  lines.push('6.2 Breach of confidentiality may result in disciplinary action and civil liability.')
-  lines.push('')
-  lines.push('7. CODE OF CONDUCT')
-  lines.push('7.1 The Employee agrees to comply with the ' + company + ' Disciplinary Code and all policies.')
-  if (notes) {
-    lines.push('')
-    lines.push('8. SPECIAL CONDITIONS')
-    lines.push(notes)
-  }
-  lines.push('')
-  lines.push('------------------------------------------------------------')
-  lines.push('EMPLOYEE SIGNATURE: _______________________  DATE: ___________')
-  lines.push('EMPLOYER REPRESENTATIVE: __________________  DATE: ___________')
-  lines.push('CCMA: 0861 16 2622 | www.ccma.org.za')
-  return lines.join('\n')
-}
-
-function buildGrievance(company, industry, size, province, notes) {
-  var lines = []
-  lines.push(company.toUpperCase())
-  lines.push('GRIEVANCE PROCEDURE')
-  lines.push('In terms of the Labour Relations Act 66 of 1995')
-  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
-  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
-  lines.push('------------------------------------------------------------')
-  lines.push('')
-  lines.push('1. PURPOSE')
-  lines.push(company + ' recognises that employees may from time to time have legitimate grievances.')
-  lines.push('This procedure provides a fair and timely mechanism for resolving such grievances.')
-  lines.push('')
-  lines.push('2. DEFINITION')
-  lines.push('A grievance is any complaint relating to:')
-  lines.push('    - Working conditions')
-  lines.push('    - Relationships with colleagues or supervisors')
-  lines.push('    - Application of company policies')
-  lines.push('    - Perceived unfair treatment')
-  lines.push('    - Health and safety concerns')
-  lines.push('')
-  lines.push('3. PRINCIPLES')
-  lines.push('3.1 All grievances will be treated seriously and investigated promptly.')
-  lines.push('3.2 Employees will not be victimised for raising a legitimate grievance.')
-  lines.push('3.3 Confidentiality will be maintained to the greatest extent possible.')
-  lines.push('')
-  lines.push('4. GRIEVANCE PROCEDURE')
-  lines.push('')
-  lines.push('STEP 1 -- INFORMAL RESOLUTION (Within 2 working days)')
-  lines.push('The employee should first discuss the matter directly with their immediate supervisor.')
-  lines.push('The supervisor must respond within 2 working days.')
-  lines.push('')
-  lines.push('STEP 2 -- FORMAL GRIEVANCE (Within 5 working days)')
-  lines.push('If unresolved, the employee submits a written grievance to HR.')
-  lines.push('HR must acknowledge receipt within 2 working days.')
-  lines.push('A formal grievance meeting must be held within 5 working days.')
-  lines.push('The employee may be accompanied by a fellow employee or shop steward.')
-  lines.push('')
-  lines.push('STEP 3 -- MANAGEMENT REVIEW (Within 5 working days)')
-  lines.push('If still unresolved, the grievance is escalated to senior management.')
-  lines.push('A written response must be provided within 3 working days of the review meeting.')
-  lines.push('')
-  lines.push('STEP 4 -- EXTERNAL DISPUTE RESOLUTION')
-  lines.push('The employee may refer the dispute to the CCMA or relevant Bargaining Council.')
-  lines.push('Unfair labour practice referral: within 90 days.')
-  lines.push('Unfair dismissal referral: within 30 days.')
-  lines.push('')
-  lines.push('5. ANTI-VICTIMISATION')
-  lines.push('No employee shall be victimised for raising a grievance in good faith.')
-  lines.push('Any victimisation will itself be treated as a disciplinary matter.')
-  if (notes) {
-    lines.push('')
-    lines.push('6. ADDITIONAL PROVISIONS')
-    lines.push(notes)
-  }
-  lines.push('')
-  lines.push('------------------------------------------------------------')
-  lines.push('CCMA Contact: 0861 16 2622 | www.ccma.org.za')
-  lines.push('Approved by: _______________________    Date: _______________')
-  lines.push('HR Manager: ' + company)
-  return lines.join('\n')
-}
-
-window.generatePolicy = async () => {
-  const company = document.getElementById('pg-company').value.trim()
-  const industry = document.getElementById('pg-industry').value
-  const size = document.getElementById('pg-size').value
-  const province = document.getElementById('pg-province').value
-  const notes = document.getElementById('pg-notes').value.trim()
-
-  if (!company) return toast('Please enter your company name.', 'error')
-  if (!industry) return toast('Please select your industry.', 'error')
-
-  const btn = document.getElementById('gen-btn')
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI is writing your document...'
-  btn.disabled = true
-  document.getElementById('policy-output').classList.add('hidden')
-
-  try {
-    // Call AI Edge Function
-    const { data: { session } } = await sb.auth.getSession()
-    const res = await fetch(
-      'https://tlnomboqhglhbyyxdgwo.supabase.co/functions/v1/generate-policy',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + session.access_token
-        },
-        body: JSON.stringify({
-          company, industry, size, province, notes,
-          policy_type: selectedPolicyType
-        })
-      }
-    )
-    const result = await res.json()
-
-    if (result.error) {
-      // Fallback to template if AI fails
-      console.warn('AI failed, using template:', result.error)
-      var builders = {
-        leave: buildLeavePolicy,
-        disciplinary: buildDisciplinaryCode,
-        contract: buildContract,
-        grievance: buildGrievance
-      }
-      generatedPolicyText = builders[selectedPolicyType](company, industry, size, province, notes)
-      toast('Generated using template (AI unavailable).', 'warning')
-    } else {
-      generatedPolicyText = result.document
-      toast('AI document generated successfully!', 'success')
-  // Update step indicator to step 3
-  var s3 = document.getElementById('step3')
-  var l2 = document.getElementById('line2')
-  var s2 = document.getElementById('step2')
-  if (s3) { s3.className = 'step-item step-active' }
-  if (s2) { s2.className = 'step-item step-done' }
-  if (l2) { l2.className = 'step-line done' }
-    }
-  } catch(err) {
-    // Fallback to template on network error
-    console.warn('Network error, using template:', err)
-    var builders2 = {
-      leave: buildLeavePolicy,
-      disciplinary: buildDisciplinaryCode,
-      contract: buildContract,
-      grievance: buildGrievance
-    }
-    generatedPolicyText = builders2[selectedPolicyType](company, industry, size, province, notes)
-    toast('Generated using template (offline).', 'warning')
-  }
-
-  document.getElementById('policy-content').textContent = generatedPolicyText
-  document.getElementById('policy-output').classList.remove('hidden')
-  document.getElementById('download-btn').style.display = 'inline-flex'
-
-  btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Document'
-  btn.disabled = false
-
-  document.getElementById('policy-output').scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
-
-window.downloadPolicy = () => {
-  if (!generatedPolicyText) return toast('Please generate a document first.', 'error')
-
-  const company = document.getElementById('pg-company').value.trim() || 'Company'
-  const industry = document.getElementById('pg-industry').value || ''
-  const province = document.getElementById('pg-province').value || ''
-  const typeLabels = {
-    leave: 'Leave Policy',
-    disciplinary: 'Disciplinary Code and Procedure',
-    contract: 'Standard Employment Contract',
-    grievance: 'Grievance Procedure'
-  }
-  const typeNames = {
-    leave: 'Leave-Policy',
-    disciplinary: 'Disciplinary-Code',
-    contract: 'Employment-Contract',
-    grievance: 'Grievance-Procedure'
-  }
-  const fileName = company.replace(/[^a-zA-Z0-9]/g, '-') + '-' + typeNames[selectedPolicyType] + '.doc'
-  const today = new Date().toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' })
-
-  // Format the document text into proper HTML paragraphs
-  const lines = generatedPolicyText.split('\n')
-  let bodyHtml = ''
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim()
-    if (!line) {
-      bodyHtml += '<p style="margin:0;height:8pt;">&nbsp;</p>'
-      continue
-    }
-    // Main title (all caps, short line)
-    if (line === line.toUpperCase() && line.length < 60 && i < 5) {
-      bodyHtml += '<p style="font-size:16pt;font-weight:bold;text-align:center;color:#1a1a2e;margin:4pt 0;">' + line + '</p>'
-    }
-    // Section headings (starts with number like "1." or "2.1")
-    else if (/^\d+\.\s+[A-Z]/.test(line) && line.length < 80) {
-      bodyHtml += '<p style="font-size:11pt;font-weight:bold;color:#1a56db;margin:14pt 0 4pt;border-bottom:1pt solid #d1d5db;padding-bottom:3pt;">' + line + '</p>'
-    }
-    // Sub-items starting with letters a) b) c) or dashes
-    else if (/^[a-z]\)/.test(line) || line.startsWith('- ') || line.startsWith('    -')) {
-      bodyHtml += '<p style="font-size:10.5pt;margin:2pt 0 2pt 24pt;color:#374151;">' + line + '</p>'
-    }
-    // Step lines
-    else if (/^Step \d/.test(line)) {
-      bodyHtml += '<p style="font-size:10.5pt;font-weight:bold;margin:6pt 0 2pt;color:#374151;">' + line + '</p>'
-    }
-    // Separator lines
-    else if (line.startsWith('---') || line.startsWith('===')) {
-      bodyHtml += '<hr style="border:none;border-top:1pt solid #d1d5db;margin:10pt 0;">'
-    }
-    // Signature lines
-    else if (line.includes('_______') || line.startsWith('EMPLOYEE') || line.startsWith('EMPLOYER') || line.startsWith('Approved')) {
-      bodyHtml += '<p style="font-size:10.5pt;margin:6pt 0;color:#374151;">' + line + '</p>'
-    }
-    // Normal paragraph
-    else {
-      bodyHtml += '<p style="font-size:10.5pt;margin:3pt 0;color:#374151;line-height:1.6;">' + line + '</p>'
-    }
-  }
-
-  const wordHtml = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-<head><meta charset="utf-8">
-<style>
-  @page {
-    size: A4;
-    margin: 2.5cm 2cm 2cm 2.5cm;
-    mso-header-margin: 1cm;
-    mso-footer-margin: 1cm;
-  }
-  body {
-    font-family: Calibri, Arial, sans-serif;
-    font-size: 10.5pt;
-    line-height: 1.5;
-    color: #374151;
-  }
-  .doc-header {
-    border-bottom: 3pt solid #1a56db;
-    padding-bottom: 14pt;
-    margin-bottom: 20pt;
-  }
-  .doc-header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8pt;
-  }
-  .brand {
-    font-size: 18pt;
-    font-weight: bold;
-    color: #1a56db;
-    letter-spacing: -0.5pt;
-  }
-  .brand-sub {
-    font-size: 8pt;
-    color: #6b7280;
-    margin-top: 2pt;
-  }
-  .doc-meta {
-    font-size: 8pt;
-    color: #6b7280;
-    text-align: right;
-    line-height: 1.6;
-  }
-  .doc-title {
-    font-size: 14pt;
-    font-weight: bold;
-    color: #1a1a2e;
-    margin: 8pt 0 4pt;
-  }
-  .doc-subtitle {
-    font-size: 9pt;
-    color: #6b7280;
-  }
-  .doc-footer {
-    border-top: 1pt solid #d1d5db;
-    margin-top: 30pt;
-    padding-top: 10pt;
-    font-size: 8pt;
-    color: #9ca3af;
-    display: flex;
-    justify-content: space-between;
-  }
-  p { margin: 3pt 0; }
-</style>
-</head>
-<body>
-<div class="doc-header">
-  <div class="doc-header-top">
-    <div>
-      <div class="brand">NexaHR</div>
-      <div class="brand-sub">Smart HR Management for South Africa</div>
-    </div>
-    <div class="doc-meta">
-      <div><strong>${company}</strong></div>
-      <div>${industry} | ${province}</div>
-      <div>Generated: ${today}</div>
-    </div>
-  </div>
-  <div class="doc-title">${typeLabels[selectedPolicyType]}</div>
-  <div class="doc-subtitle">Generated in compliance with South African Labour Law | NexaHR AI Policy Generator</div>
-</div>
-
-${bodyHtml}
-
-<div class="doc-footer">
-  <span>Confidential - ${company}</span>
-  <span>Generated by NexaHR | nexahr.co.za</span>
-  <span>${today}</span>
-</div>
-</body>
-</html>`
-
-  const blob = new Blob(['\ufeff' + wordHtml], { type: 'application/msword;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = fileName
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
-  toast('Professional document downloaded!', 'success')
-}
-
-// Single clean auth handler - fixes all session/login/logout issues
-let appInitialised = false
-
-async function bootApp() {
-  try {
-    // Check localStorage for cached session first - instant on mobile
-    const cachedUser = localStorage.getItem('nexahr_user')
-    if (cachedUser) {
-      try {
-        const user = JSON.parse(cachedUser)
-        // Show app immediately with cached data
-        await initApp(user)
-        hideLoading()
-        // Then silently verify session in background
-        sb.auth.getSession().then(async ({ data: { session } }) => {
-          if (!session) {
-            // Session expired - force logout
-            localStorage.removeItem('nexahr_user')
-            await sb.auth.signOut()
-            location.reload()
-          }
-        }).catch(() => {})
-        return
-      } catch(e) {
-        localStorage.removeItem('nexahr_user')
-      }
-    }
-
-    // No cache - fetch from Supabase with 10s timeout
-    const sessionPromise = sb.auth.getSession()
-    const timeoutPromise = new Promise((resolve) =>
-      setTimeout(() => resolve({ data: { session: null }, timedOut: true }), 10000)
-    )
-
-    const result = await Promise.race([sessionPromise, timeoutPromise])
-    const session = result.data?.session
-
-    if (session && session.user) {
-      localStorage.setItem('nexahr_user', JSON.stringify(session.user))
-      await initApp(session.user)
-    } else {
-      document.getElementById('auth-page').classList.remove('hidden')
-    }
-  } catch(err) {
-    console.error('Boot error:', err)
-    document.getElementById('auth-page').classList.remove('hidden')
-  } finally {
-    hideLoading()
-  }
-}
-
-sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('Auth event:', event)
-  if (event === 'SIGNED_IN' && session && !appInitialised) {
-    appInitialised = true
-    await initApp(session.user)
-    hideLoading()
-  } else if (event === 'SIGNED_OUT') {
-    appInitialised = false
-    cu = null; cp = null; allApps = []
-    document.getElementById('main-app').classList.add('hidden')
-    document.getElementById('auth-page').classList.remove('hidden')
-    hideLoading()
-  }
-})
-
-// -- RESET LEAVE BALANCES --
-window.toggleResetEmployee = function() {
-  var scope = document.getElementById('reset-scope').value
-  var empSelect = document.getElementById('reset-employee-select')
-  if (scope === 'single') {
-    empSelect.classList.remove('hidden')
-    loadEmployeesForReset()
-  } else {
-    empSelect.classList.add('hidden')
-  }
-}
-
-async function loadEmployeesForReset() {
-  var sel = document.getElementById('reset-employee-id')
-  sel.innerHTML = '<option value="">Loading...</option>'
-  var { data } = await sb.from('profiles').select('id, full_name').order('full_name')
-  if (data) {
-    sel.innerHTML = '<option value="">Select an employee...</option>' +
-      data.map(function(p) {
-        return '<option value="' + p.id + '">' + (p.full_name || 'Unknown') + '</option>'
-      }).join('')
-  }
-}
-
-window.resetLeaveBalance = async function() {
-  var leaveType = document.getElementById('reset-leave-type').value
-  var scope = document.getElementById('reset-scope').value
-  var employeeId = scope === 'single' ? document.getElementById('reset-employee-id').value : null
-
-  if (scope === 'single' && !employeeId) {
-    return toast('Please select an employee.', 'error')
-  }
-
-  // Confirm action
-  if (!confirm('Are you sure you want to reset ' + leaveType + ' for ' + (scope === 'all' ? 'ALL employees' : 'this employee') + '? This cannot be undone.')) {
-    return
-  }
-
-  try {
-    // Get all approved applications for this leave type
-    var query = sb.from('leave_applications')
-      .select('id, employee_id, working_days')
-      .eq('leave_type', leaveType)
-      .eq('status', 'approved')
-
-    if (scope === 'single') {
-      query = query.eq('employee_id', employeeId)
-    }
-
-    var { data: apps } = await query
-
-    if (!apps || apps.length === 0) {
-      toast('No approved ' + leaveType + ' applications found to reset.', 'info')
-      return
-    }
-
-    // Cancel all found applications to reset the balance
-    var ids = apps.map(function(a) { return a.id })
-    await sb.from('leave_applications')
-      .update({ status: 'cancelled' })
-      .in('id', ids)
-
-    // Log reset in history
-    var history = JSON.parse(localStorage.getItem('nexahr_reset_history') || '[]')
-    history.unshift({
-      date: new Date().toLocaleDateString('en-ZA'),
-      leaveType: leaveType,
-      scope: scope === 'all' ? 'All employees' : 'Single employee',
-      count: apps.length,
-      resetBy: cp?.full_name || 'Manager'
-    })
-    localStorage.setItem('nexahr_reset_history', JSON.stringify(history.slice(0, 20)))
-
-    await loadAllApps()
-    renderResetHistory()
-    toast(leaveType + ' balance reset successfully for ' + apps.length + ' application(s).', 'success')
-
-  } catch(err) {
-    toast('Reset failed: ' + err.message, 'error')
-  }
-}
-
-function renderResetHistory() {
-  var history = JSON.parse(localStorage.getItem('nexahr_reset_history') || '[]')
-  var el = document.getElementById('reset-history-list')
-  if (!el) return
-  if (history.length === 0) {
-    el.innerHTML = '<p style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:20px;">No resets recorded yet.</p>'
-    return
-  }
-  el.innerHTML = history.map(function(h) {
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100);font-size:0.85rem;">' +
-      '<div><strong>' + h.leaveType + '</strong> <span style="color:var(--gray-500);">-- ' + h.scope + '</span></div>' +
-      '<div style="color:var(--gray-400);font-size:0.78rem;">' + h.date + ' by ' + h.resetBy + '</div>' +
-    '</div>'
-  }).join('')
-}
-
-// -- MANAGE TEAM --
-async function loadTeam() {
-  var tbody = document.getElementById('team-tbody')
-  var countEl = document.getElementById('team-count')
-  if (!tbody) return
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>'
-
-  try {
-    var res = await sb.from('profiles').select('id, full_name, department, role').order('full_name')
-    var profiles = res.data || []
-    if (countEl) countEl.textContent = profiles.length + ' member' + (profiles.length !== 1 ? 's' : '')
-
-    if (profiles.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);">No team members found.</td></tr>'
-      return
-    }
-
-    var roleBadge = {
-      employee: 'background:#f3f4f6;color:#374151;',
-      manager: 'background:#dbeafe;color:#1e40af;',
-      hr_admin: 'background:#dcfce7;color:#166534;'
-    }
-    var roleLabel = { employee: 'Employee', manager: 'Manager', hr_admin: 'HR Admin' }
-
-    var rows = profiles.map(function(p) {
-      var isMe = p.id === cu.id
-      var badge = roleBadge[p.role] || roleBadge.employee
-      var label = roleLabel[p.role] || p.role
-      var nameInit = (p.full_name || 'U').charAt(0).toUpperCase()
-      var nameTxt = (p.full_name || 'Unknown') + (isMe ? ' (you)' : '')
-      var deptTxt = p.department || 'Not set'
-
-      var roleDropdown = isMe
-        ? '<span style="color:var(--gray-400);font-size:0.78rem;font-style:italic;">Cannot change own role</span>'
-        : '<select data-pid="' + p.id + '" class="role-select" style="padding:6px 10px;border:1.5px solid var(--gray-300);border-radius:6px;font-size:0.8rem;outline:none;cursor:pointer;background:white;">'
-          + '<option value="employee"' + (p.role === 'employee' ? ' selected' : '') + '>Employee</option>'
-          + '<option value="manager"' + (p.role === 'manager' ? ' selected' : '') + '>Manager</option>'
-          + '<option value="hr_admin"' + (p.role === 'hr_admin' ? ' selected' : '') + '>HR Admin</option>'
-          + '</select>'
-
-      return '<tr>'
-        + '<td><div style="display:flex;align-items:center;gap:10px;">'
-        + '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#1a56db);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.8rem;flex-shrink:0;">' + nameInit + '</div>'
-        + '<span style="font-weight:600;font-size:0.85rem;">' + nameTxt + '</span>'
-        + '</div></td>'
-        + '<td style="color:var(--gray-500);font-size:0.83rem;">' + deptTxt + '</td>'
-        + '<td><span style="padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;' + badge + '">' + label + '</span></td>'
-        + '<td>' + roleDropdown + '</td>'
-        + '<td id="rstatus-' + p.id + '" style="font-size:0.78rem;color:var(--gray-400);min-width:80px;"></td>'
-        + '</tr>'
-    })
-
-    tbody.innerHTML = rows.join('')
-    // Attach change events after rendering
-    document.querySelectorAll('.role-select').forEach(function(sel) {
-      sel.addEventListener('change', function() {
-        updateRole(this.getAttribute('data-pid'), this.value, this)
-      })
-    })
-  } catch(err) {
-    toast('Error loading team: ' + err.message, 'error')
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#ef4444;">Error loading team. Please try again.</td></tr>'
-  }
-}
-
-window.updateRole = async function(profileId, newRole, selectEl) {
-  var statusEl = document.getElementById('rstatus-' + profileId)
-  if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--primary);"></i>'
-  if (selectEl) selectEl.disabled = true
-
-  var res = await sb.from('profiles').update({ role: newRole }).eq('id', profileId)
-
-  if (selectEl) selectEl.disabled = false
-
-  if (res.error) {
-    toast('Update failed: ' + res.error.message, 'error')
-    if (statusEl) statusEl.innerHTML = '<span style="color:#ef4444;"><i class="fa-solid fa-xmark"></i> Failed</span>'
-    return
-  }
-
-  var roleLabel = { employee: 'Employee', manager: 'Manager', hr_admin: 'HR Admin' }
-  if (statusEl) {
-    statusEl.innerHTML = '<span style="color:#059669;"><i class="fa-solid fa-circle-check"></i> Saved</span>'
-    setTimeout(function() { if (statusEl) statusEl.innerHTML = '' }, 3000)
-  }
-  toast('Role updated to ' + (roleLabel[newRole] || newRole) + ' successfully!', 'success')
-}
-
-// Boot the app on page load
-bootApp()
-</script>
-</body>
-</html>

@@ -1466,4 +1466,50 @@ window.setStatus = async (id, status, reason='') => {
 
   await loadAllApps()
   renderMgr()
+}async function bootApp() {
+  try {
+    // Check localStorage cache first for instant load
+    const cachedUser = localStorage.getItem('nexahr_user')
+    if (cachedUser) {
+      try {
+        const user = JSON.parse(cachedUser)
+        await initApp(user)
+        hideLoading()
+        // Silently verify in background
+        sb.auth.getSession().then(async ({ data: { session } }) => {
+          if (!session) {
+            localStorage.removeItem('nexahr_user')
+            location.reload()
+          }
+        }).catch(() => {})
+        return
+      } catch(e) {
+        localStorage.removeItem('nexahr_user')
+      }
+    }
+
+    // No cache - get session with 8s timeout
+    let session = null
+    try {
+      const result = await Promise.race([
+        sb.auth.getSession(),
+        new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 8000))
+      ])
+      session = result.data?.session
+    } catch(e) {
+      console.error('Session error:', e)
+    }
+
+    if (session?.user) {
+      localStorage.setItem('nexahr_user', JSON.stringify(session.user))
+      await initApp(session.user)
+    } else {
+      document.getElementById('auth-page').classList.remove('hidden')
+    }
+  } catch(err) {
+    console.error('Boot error:', err)
+    document.getElementById('auth-page').classList.remove('hidden')
+  } finally {
+    hideLoading()
+  }
 }

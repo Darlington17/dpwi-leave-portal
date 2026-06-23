@@ -1184,21 +1184,42 @@ async function initApp(user) {
   document.getElementById('auth-page').classList.add('hidden')
 
   // Load or create profile
-  let { data: profile } = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
+  let profileRes = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
+  let profile = profileRes.data
+
+  console.log('Profile loaded:', profile?.role, 'company:', profile?.company_id)
+
   if (!profile) {
+    // Create profile if missing
     await sb.from('profiles').upsert({
       id: user.id,
       full_name: user.user_metadata?.full_name || user.email.split('@')[0],
-      role: user.user_metadata?.role || 'employee',
+      role: 'employee',
       department: user.user_metadata?.department || ''
     })
-    const res = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
-    profile = res.data
-  } else if (!profile.full_name) {
+    profileRes = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
+    profile = profileRes.data
+  }
+
+  if (!profile) {
+    // If still null - RLS is blocking. Use minimal fallback
+    profile = {
+      id: user.id,
+      full_name: user.user_metadata?.full_name || user.email.split('@')[0],
+      role: user.user_metadata?.role || 'employee',
+      department: '',
+      company_id: null,
+      companies: null
+    }
+    console.warn('Profile blocked by RLS - using fallback')
+  }
+
+  if (profile && !profile.full_name) {
     const fixedName = user.user_metadata?.full_name || user.email.split('@')[0]
     await sb.from('profiles').update({ full_name: fixedName }).eq('id', user.id)
     profile.full_name = fixedName
   }
+
   cp = profile
   const displayName = cp?.full_name 
     || cu?.user_metadata?.full_name 

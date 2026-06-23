@@ -1219,11 +1219,17 @@ async function initApp(user) {
   if (companyEl && cp?.companies?.name) {
     companyEl.textContent = cp.companies.name
   }
-  if (cp?.role === 'manager' || cp?.role === 'admin') {
+  // Support both old hr_admin and new admin role names
+  const userRole = cp?.role || ''
+  const isManager = userRole === 'manager' || userRole === 'admin' || userRole === 'hr_admin'
+  const isAdmin = userRole === 'admin' || userRole === 'hr_admin'
+  console.log('User role:', userRole, 'isManager:', isManager, 'isAdmin:', isAdmin)
+
+  if (isManager) {
     document.getElementById('mgr-nav').classList.remove('hidden')
     document.getElementById('tools-nav').classList.remove('hidden')
   }
-  if (cp?.role === 'admin') {
+  if (isAdmin) {
     document.getElementById('admin-nav').classList.remove('hidden')
   }
   document.getElementById('auth-page').classList.add('hidden')

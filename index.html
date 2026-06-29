@@ -1202,16 +1202,40 @@ async function initApp(user) {
   }
 
   if (!profile) {
-    // If still null - RLS is blocking. Use minimal fallback
-    profile = {
-      id: user.id,
-      full_name: user.user_metadata?.full_name || user.email.split('@')[0],
-      role: user.user_metadata?.role || 'employee',
-      department: '',
-      company_id: null,
-      companies: null
+    // RLS blocking - try direct REST call with auth header
+    console.warn('Profile blocked by RLS - attempting direct fetch')
+    try {
+      const { data: { session } } = await sb.auth.getSession()
+      const resp = await fetch(
+        'https://tlnomboqhglhbyyxdgwo.supabase.co/rest/v1/profiles?id=eq.' + user.id + '&select=*',
+        {
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsbm9tYm9xaGdsaGJ5eXhkZ3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MzQwNjIsImV4cCI6MjA5NTQxMDA2Mn0.Eo7we1Qz00mNZ8NJmaDc0qzFwFxoY6KxNntdz-bTGJM',
+            'Authorization': 'Bearer ' + (session?.access_token || '')
+          }
+        }
+      )
+      const rows = await resp.json()
+      if (rows && rows.length > 0) {
+        profile = rows[0]
+        profile.companies = null
+        console.log('Direct fetch succeeded, role:', profile.role)
+      }
+    } catch(fetchErr) {
+      console.error('Direct fetch failed:', fetchErr)
     }
-    console.warn('Profile blocked by RLS - using fallback')
+
+    if (!profile) {
+      profile = {
+        id: user.id,
+        full_name: user.user_metadata?.full_name || user.email.split('@')[0],
+        role: user.user_metadata?.role || 'employee',
+        department: '',
+        company_id: null,
+        companies: null
+      }
+      console.warn('Using metadata fallback, role:', profile.role)
+    }
   }
 
   if (profile && !profile.full_name) {
@@ -1265,7 +1289,7 @@ async function loadAllApps() {
     .select('*, profiles!employee_id(full_name, department)')
     .order('created_at', { ascending: false })
   allApps = data || []
-  updateNotifBadge()
+  if (typeof updateNotifBadge === 'function') updateNotifBadge()
 }
 
 function myApps() { return allApps.filter(a => a.employee_id === cu?.id) }

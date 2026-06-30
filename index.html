@@ -1520,6 +1520,540 @@ window.setStatus = async (id, status, reason='') => {
   renderMgr()
 }
 
+// ===========================================================
+// RESTORED FUNCTIONS - viewApp, calendar, notifications, team, reset
+// ===========================================================
+
+// -- VIEW APPLICATION MODAL --
+window.viewApp = function(id) {
+  const a = allApps.find(x => x.id === id)
+  if (!a) return
+  const empName = a.profiles?.full_name || 'Unknown'
+  const statusLabel = a.status === 'manager_approved' ? 'MANAGER APPROVED' : a.status.toUpperCase()
+  document.getElementById('modal-body').innerHTML =
+    '<h2 style="color:var(--primary);margin-bottom:18px;font-size:1.1rem;"><i class="fa-solid fa-file-lines"></i> Application #' + a.id.slice(0,8).toUpperCase() + '</h2>' +
+    '<div class="det-grid">' +
+      '<div class="det-item"><strong>Employee</strong>' + empName + '</div>' +
+      '<div class="det-item"><strong>Leave Type</strong>' + a.leave_type + '</div>' +
+      '<div class="det-item"><strong>Start Date</strong>' + fmt(a.start_date) + '</div>' +
+      '<div class="det-item"><strong>End Date</strong>' + fmt(a.end_date) + '</div>' +
+      '<div class="det-item"><strong>Working Days</strong>' + a.working_days + '</div>' +
+      '<div class="det-item"><strong>Applied On</strong>' + fmt(a.created_at) + '</div>' +
+      '<div class="det-item"><strong>Status</strong><span class="badge badge-' + a.status + '">' + statusLabel + '</span></div>' +
+      (a.reason ? '<div class="det-item" style="grid-column:span 2"><strong>Notes</strong>' + a.reason + '</div>' : '') +
+    '</div>' +
+    '<div style="border-top:1px solid var(--gray-100);padding-top:14px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">' +
+      ((a.status === 'pending' && a.employee_id === cu?.id) ? '<button class="btn btn-danger btn-sm" onclick="closeModal(\'modal\');askCancel(\'' + a.id + '\')"><i class="fa-solid fa-ban"></i> Cancel</button>' : '') +
+      '<button class="btn btn-sm" style="background:var(--gray-100);color:var(--gray-700)" onclick="closeModal(\'modal\')">Close</button>' +
+    '</div>'
+  document.getElementById('modal').classList.remove('hidden')
+}
+
+// -- CALENDAR --
+function renderCalendar() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+  const y = calDate.getFullYear(), m = calDate.getMonth()
+  const titleEl = document.getElementById('cal-month-title')
+  if (titleEl) titleEl.textContent = months[m] + ' ' + y
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+  let html = days.map(d => '<div class="cal-day-name">' + d + '</div>').join('')
+  const first = new Date(y,m,1).getDay()
+  const last = new Date(y,m+1,0).getDate()
+  const prevLast = new Date(y,m,0).getDate()
+  const today = new Date()
+  const monthApps = allApps.filter(function(a) {
+    if (!a.start_date) return false
+    const d = new Date(a.start_date)
+    return d.getFullYear() === y && d.getMonth() === m
+  })
+  for (let i = first-1; i >= 0; i--) {
+    html += '<div class="cal-day other-month"><div class="day-num">' + (prevLast-i) + '</div></div>'
+  }
+  for (let d = 1; d <= last; d++) {
+    const isToday = today.getDate() === d && today.getMonth() === m && today.getFullYear() === y
+    const dayApps = monthApps.filter(function(a) { return new Date(a.start_date).getDate() === d })
+    html += '<div class="cal-day' + (isToday ? ' today' : '') + (dayApps.length ? ' has-leave' : '') + '">' +
+      '<div class="day-num">' + d + '</div>' +
+      dayApps.map(function(a) {
+        const name = (a.profiles?.full_name || '?').split(' ')[0]
+        return '<div class="cal-event ' + a.status + '" title="' + name + ' - ' + a.leave_type + '">' + name + '</div>'
+      }).join('') +
+    '</div>'
+  }
+  const remaining = (first+last) % 7 === 0 ? 0 : 7 - ((first+last) % 7)
+  for (let i = 1; i <= remaining; i++) {
+    html += '<div class="cal-day other-month"><div class="day-num">' + i + '</div></div>'
+  }
+  const gridEl = document.getElementById('cal-grid')
+  if (gridEl) gridEl.innerHTML = html
+}
+
+window.changeMonth = function(dir) {
+  calDate = dir === 0 ? new Date() : new Date(calDate.getFullYear(), calDate.getMonth()+dir, 1)
+  renderCalendar()
+}
+
+// -- NOTIFICATION BADGE --
+function updateNotifBadge() {
+  const lastViewed = parseInt(localStorage.getItem('nexahr_last_viewed') || '0')
+  const n = myApps().filter(function(a) {
+    if (a.status !== 'approved' && a.status !== 'rejected') return false
+    const updatedAt = new Date(a.approved_at || a.created_at).getTime()
+    return updatedAt > lastViewed
+  }).length
+  const badge = document.getElementById('notif-count')
+  if (!badge) return
+  badge.textContent = n
+  badge.classList.toggle('hidden', n === 0)
+}
+
+function clearNotifBadge() {
+  localStorage.setItem('nexahr_last_viewed', Date.now().toString())
+  const badge = document.getElementById('notif-count')
+  if (badge) {
+    badge.textContent = '0'
+    badge.classList.add('hidden')
+  }
+}
+
+// -- RESET LEAVE BALANCES --
+window.toggleResetEmployee = function() {
+  const scope = document.getElementById('reset-scope').value
+  const empSelect = document.getElementById('reset-employee-select')
+  if (scope === 'single') {
+    empSelect.classList.remove('hidden')
+    loadEmployeesForReset()
+  } else {
+    empSelect.classList.add('hidden')
+  }
+}
+
+async function loadEmployeesForReset() {
+  const sel = document.getElementById('reset-employee-id')
+  if (!sel) return
+  sel.innerHTML = '<option value="">Loading...</option>'
+  const { data } = await sb.from('profiles').select('id, full_name').order('full_name')
+  if (data) {
+    sel.innerHTML = '<option value="">Select an employee...</option>' +
+      data.map(function(p) { return '<option value="' + p.id + '">' + (p.full_name || 'Unknown') + '</option>' }).join('')
+  }
+}
+
+window.resetLeaveBalance = async function() {
+  const leaveType = document.getElementById('reset-leave-type').value
+  const scope = document.getElementById('reset-scope').value
+  const employeeId = scope === 'single' ? document.getElementById('reset-employee-id').value : null
+
+  if (scope === 'single' && !employeeId) return toast('Please select an employee.', 'error')
+  if (!confirm('Reset ' + leaveType + ' for ' + (scope === 'all' ? 'ALL employees' : 'this employee') + '? Cannot be undone.')) return
+
+  try {
+    let query = sb.from('leave_applications').select('id').eq('leave_type', leaveType).eq('status', 'approved')
+    if (scope === 'single') query = query.eq('employee_id', employeeId)
+    const { data: apps } = await query
+
+    if (!apps || apps.length === 0) {
+      toast('No approved ' + leaveType + ' applications found.', 'info')
+      return
+    }
+
+    const ids = apps.map(function(a) { return a.id })
+    await sb.from('leave_applications').update({ status: 'cancelled' }).in('id', ids)
+
+    const history = JSON.parse(localStorage.getItem('nexahr_reset_history') || '[]')
+    history.unshift({
+      date: new Date().toLocaleDateString('en-ZA'),
+      leaveType: leaveType,
+      scope: scope === 'all' ? 'All employees' : 'Single employee',
+      count: apps.length,
+      resetBy: cp?.full_name || 'Admin'
+    })
+    localStorage.setItem('nexahr_reset_history', JSON.stringify(history.slice(0, 20)))
+
+    await loadAllApps()
+    renderResetHistory()
+    toast(leaveType + ' reset for ' + apps.length + ' application(s).', 'success')
+  } catch(err) {
+    toast('Reset failed: ' + err.message, 'error')
+  }
+}
+
+function renderResetHistory() {
+  const history = JSON.parse(localStorage.getItem('nexahr_reset_history') || '[]')
+  const el = document.getElementById('reset-history-list')
+  if (!el) return
+  if (history.length === 0) {
+    el.innerHTML = '<p style="color:var(--gray-400);font-size:0.85rem;text-align:center;padding:20px;">No resets recorded yet.</p>'
+    return
+  }
+  el.innerHTML = history.map(function(h) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100);font-size:0.85rem;">' +
+      '<div><strong>' + h.leaveType + '</strong> <span style="color:var(--gray-500);">-- ' + h.scope + '</span></div>' +
+      '<div style="color:var(--gray-400);font-size:0.78rem;">' + h.date + ' by ' + h.resetBy + '</div>' +
+    '</div>'
+  }).join('')
+}
+
+// -- MANAGE TEAM --
+async function loadTeam() {
+  const tbody = document.getElementById('team-tbody')
+  const countEl = document.getElementById('team-count')
+  if (!tbody) return
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>'
+
+  try {
+    const res = await sb.from('profiles').select('id, full_name, department, role').order('full_name')
+    const profiles = res.data || []
+    if (countEl) countEl.textContent = profiles.length + ' member' + (profiles.length !== 1 ? 's' : '')
+
+    if (profiles.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--gray-400);">No team members found.</td></tr>'
+      return
+    }
+
+    const roleBadge = {
+      employee: 'background:#f3f4f6;color:#374151;',
+      manager: 'background:#dbeafe;color:#1e40af;',
+      admin: 'background:#dcfce7;color:#166534;',
+      hr_admin: 'background:#dcfce7;color:#166534;'
+    }
+    const roleLabel = { employee: 'Employee', manager: 'Manager', admin: 'Admin', hr_admin: 'Admin' }
+
+    const rows = profiles.map(function(p) {
+      const isMe = p.id === cu.id
+      const badge = roleBadge[p.role] || roleBadge.employee
+      const label = roleLabel[p.role] || p.role
+      const nameInit = (p.full_name || 'U').charAt(0).toUpperCase()
+      const nameTxt = (p.full_name || 'Unknown') + (isMe ? ' (you)' : '')
+      const deptTxt = p.department || 'Not set'
+      const normalizedRole = (p.role === 'hr_admin') ? 'admin' : p.role
+
+      const roleDropdown = isMe
+        ? '<span style="color:var(--gray-400);font-size:0.78rem;font-style:italic;">Cannot change own role</span>'
+        : '<select data-pid="' + p.id + '" class="role-select" style="padding:6px 10px;border:1.5px solid var(--gray-300);border-radius:6px;font-size:0.8rem;outline:none;cursor:pointer;background:white;">' +
+            '<option value="employee"' + (normalizedRole === 'employee' ? ' selected' : '') + '>Employee</option>' +
+            '<option value="manager"' + (normalizedRole === 'manager' ? ' selected' : '') + '>Manager</option>' +
+            '<option value="admin"' + (normalizedRole === 'admin' ? ' selected' : '') + '>Admin</option>' +
+          '</select>'
+
+      return '<tr>' +
+        '<td><div style="display:flex;align-items:center;gap:10px;">' +
+        '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#1a56db);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.8rem;flex-shrink:0;">' + nameInit + '</div>' +
+        '<span style="font-weight:600;font-size:0.85rem;">' + nameTxt + '</span>' +
+        '</div></td>' +
+        '<td style="color:var(--gray-500);font-size:0.83rem;">' + deptTxt + '</td>' +
+        '<td><span style="padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;' + badge + '">' + label + '</span></td>' +
+        '<td>' + roleDropdown + '</td>' +
+        '<td id="rstatus-' + p.id + '" style="font-size:0.78rem;color:var(--gray-400);min-width:80px;"></td>' +
+        '</tr>'
+    })
+
+    tbody.innerHTML = rows.join('')
+    document.querySelectorAll('.role-select').forEach(function(sel) {
+      sel.addEventListener('change', function() {
+        updateRole(this.getAttribute('data-pid'), this.value, this)
+      })
+    })
+  } catch(err) {
+    toast('Error loading team: ' + err.message, 'error')
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#ef4444;">Error loading team.</td></tr>'
+  }
+}
+
+window.updateRole = async function(profileId, newRole, selectEl) {
+  const statusEl = document.getElementById('rstatus-' + profileId)
+  if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--primary);"></i>'
+  if (selectEl) selectEl.disabled = true
+
+  const res = await sb.from('profiles').update({ role: newRole }).eq('id', profileId)
+
+  if (selectEl) selectEl.disabled = false
+
+  if (res.error) {
+    toast('Update failed: ' + res.error.message, 'error')
+    if (statusEl) statusEl.innerHTML = '<span style="color:#ef4444;"><i class="fa-solid fa-xmark"></i> Failed</span>'
+    return
+  }
+
+  const roleLabel = { employee: 'Employee', manager: 'Manager', admin: 'Admin' }
+  if (statusEl) {
+    statusEl.innerHTML = '<span style="color:#059669;"><i class="fa-solid fa-circle-check"></i> Saved</span>'
+    setTimeout(function() { if (statusEl) statusEl.innerHTML = '' }, 3000)
+  }
+  toast('Role updated to ' + (roleLabel[newRole] || newRole) + '!', 'success')
+}
+
+// -- POLICY GENERATOR --
+let selectedPolicyType = 'leave'
+let generatedPolicyText = ''
+
+window.selectPolicyType = function(type) {
+  selectedPolicyType = type
+  document.querySelectorAll('.policy-type-card').forEach(function(c) { c.classList.remove('active-card') })
+  const card = document.getElementById('ptype-' + type)
+  if (card) card.classList.add('active-card')
+  const s1 = document.getElementById('step1')
+  const l1 = document.getElementById('line1')
+  if (s1) s1.className = 'step-item step-done'
+  if (l1) l1.className = 'step-line done'
+}
+
+function buildLeavePolicy(company, industry, size, province, notes) {
+  const lines = []
+  lines.push(company.toUpperCase())
+  lines.push('LEAVE POLICY')
+  lines.push('In terms of the Basic Conditions of Employment Act 75 of 1997 (BCEA)')
+  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
+  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('1. PURPOSE AND SCOPE')
+  lines.push('This Leave Policy applies to all employees of ' + company + ' in compliance with the BCEA.')
+  lines.push('')
+  lines.push('2. ANNUAL LEAVE')
+  lines.push('2.1 Employees are entitled to 21 consecutive days (15 working days) paid annual leave per cycle.')
+  lines.push('2.2 Leave must be taken at a time agreed between employer and employee.')
+  lines.push('')
+  lines.push('3. SICK LEAVE')
+  lines.push('3.1 During every 36-month sick leave cycle, employees are entitled to paid sick leave equal to')
+  lines.push('    the number of days they would normally work in 6 weeks.')
+  lines.push('3.2 A medical certificate may be required for absences of more than 2 consecutive days.')
+  lines.push('')
+  lines.push('4. FAMILY RESPONSIBILITY LEAVE')
+  lines.push('4.1 Employees employed longer than 4 months are entitled to 3 days paid leave per cycle.')
+  lines.push('')
+  lines.push('5. MATERNITY LEAVE')
+  lines.push('5.1 Pregnant employees are entitled to at least 4 consecutive months maternity leave.')
+  lines.push('')
+  lines.push('6. PARENTAL LEAVE')
+  lines.push('6.1 Parents are entitled to 10 consecutive days parental leave.')
+  lines.push('')
+  lines.push('7. LEAVE APPLICATION PROCEDURE')
+  lines.push('7.1 All applications submitted via the ' + company + ' NexaHR portal.')
+  lines.push('7.2 Direct supervisor must approve all leave applications.')
+  if (notes) { lines.push(''); lines.push('8. ADDITIONAL PROVISIONS'); lines.push(notes) }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('Approved by: _______________________    Date: _______________')
+  lines.push('HR Manager: ' + company)
+  return lines.join('\n')
+}
+
+function buildDisciplinaryCode(company, industry, size, province, notes) {
+  const lines = []
+  lines.push(company.toUpperCase())
+  lines.push('DISCIPLINARY CODE AND PROCEDURE')
+  lines.push('In terms of the Labour Relations Act 66 of 1995')
+  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
+  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('1. PURPOSE')
+  lines.push(company + ' is committed to a fair, consistent disciplinary process per the LRA.')
+  lines.push('')
+  lines.push('2. CATEGORIES OF MISCONDUCT')
+  lines.push('2.1 MINOR: Poor timekeeping, unauthorised 1-day absence -- Verbal Warning')
+  lines.push('2.2 SERIOUS: Repeated minor misconduct, 2-3 day absence -- Written Warning')
+  lines.push('2.3 GROSS: Theft, assault, harassment, intoxication -- May result in dismissal')
+  lines.push('')
+  lines.push('3. PROGRESSIVE DISCIPLINE')
+  lines.push('Step 1: Verbal Warning (3 months) -> Step 2: Written Warning (6 months)')
+  lines.push('Step 3: Final Written Warning (12 months) -> Step 4: Dismissal')
+  lines.push('')
+  lines.push('4. DISCIPLINARY HEARING')
+  lines.push('4.1 48 hours written notice required before any hearing.')
+  lines.push('4.2 Employee may be represented by a colleague or union representative.')
+  lines.push('4.3 Right to appeal within 5 working days of the outcome.')
+  if (notes) { lines.push(''); lines.push('5. ADDITIONAL PROVISIONS'); lines.push(notes) }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('CCMA: 0861 16 2622 | www.ccma.org.za')
+  lines.push('Approved by: _______________________    Date: _______________')
+  lines.push('HR Manager: ' + company)
+  return lines.join('\n')
+}
+
+function buildContract(company, industry, size, province, notes) {
+  const lines = []
+  lines.push(company.toUpperCase())
+  lines.push('STANDARD EMPLOYMENT CONTRACT')
+  lines.push('In terms of the Basic Conditions of Employment Act 75 of 1997')
+  lines.push('Province: ' + province + ' | Sector: ' + industry)
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('EMPLOYER: ' + company)
+  lines.push('EMPLOYEE: _________________________')
+  lines.push('POSITION: _________________________')
+  lines.push('')
+  lines.push('1. NATURE OF EMPLOYMENT')
+  lines.push('1.1 Permanent / fixed-term contract. First 3 months is probationary.')
+  lines.push('')
+  lines.push('2. REMUNERATION')
+  lines.push('2.1 Remunerated at R_______________ per month, paid monthly.')
+  lines.push('2.2 PAYE, UIF and statutory deductions apply as required by law.')
+  lines.push('')
+  lines.push('3. WORKING HOURS')
+  lines.push('3.1 Ordinary hours not exceeding 45 hours per week or 9 hours per day.')
+  lines.push('')
+  lines.push('4. LEAVE')
+  lines.push('4.1 21 consecutive days annual leave per cycle, per ' + company + ' Leave Policy.')
+  lines.push('')
+  lines.push('5. NOTICE PERIOD')
+  lines.push('5.1 Less than 6 months: 1 week. 6mo-1yr: 2 weeks. Over 1 year: 4 weeks.')
+  lines.push('')
+  lines.push('6. CONFIDENTIALITY')
+  lines.push('6.1 Employee agrees to keep all business information confidential.')
+  if (notes) { lines.push(''); lines.push('7. SPECIAL CONDITIONS'); lines.push(notes) }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('EMPLOYEE SIGNATURE: _______________________  DATE: ___________')
+  lines.push('EMPLOYER REPRESENTATIVE: __________________  DATE: ___________')
+  return lines.join('\n')
+}
+
+function buildGrievance(company, industry, size, province, notes) {
+  const lines = []
+  lines.push(company.toUpperCase())
+  lines.push('GRIEVANCE PROCEDURE')
+  lines.push('In terms of the Labour Relations Act 66 of 1995')
+  lines.push('Province: ' + province + ' | Sector: ' + industry + ' | Employees: ' + size)
+  lines.push('Effective Date: ' + new Date().toLocaleDateString('en-ZA'))
+  lines.push('------------------------------------------------------------')
+  lines.push('')
+  lines.push('1. PURPOSE')
+  lines.push(company + ' provides this procedure for raising and resolving workplace grievances.')
+  lines.push('')
+  lines.push('2. PROCEDURE')
+  lines.push('STEP 1 - Informal: Discuss with supervisor within 2 working days.')
+  lines.push('STEP 2 - Formal: Submit written grievance to HR; meeting within 5 working days.')
+  lines.push('STEP 3 - Management Review: Escalation to senior management if unresolved.')
+  lines.push('STEP 4 - External: Refer to CCMA (90 days unfair labour practice, 30 days dismissal).')
+  lines.push('')
+  lines.push('3. ANTI-VICTIMISATION')
+  lines.push('3.1 No employee shall be victimised for raising a grievance in good faith.')
+  if (notes) { lines.push(''); lines.push('4. ADDITIONAL PROVISIONS'); lines.push(notes) }
+  lines.push('')
+  lines.push('------------------------------------------------------------')
+  lines.push('CCMA: 0861 16 2622 | www.ccma.org.za')
+  lines.push('Approved by: _______________________    Date: _______________')
+  lines.push('HR Manager: ' + company)
+  return lines.join('\n')
+}
+
+window.generatePolicy = async function() {
+  const company = document.getElementById('pg-company').value.trim()
+  const industry = document.getElementById('pg-industry').value
+  const size = document.getElementById('pg-size').value
+  const province = document.getElementById('pg-province').value
+  const notes = document.getElementById('pg-notes').value.trim()
+
+  if (!company) return toast('Please enter your company name.', 'error')
+  if (!industry) return toast('Please select your industry.', 'error')
+
+  const btn = document.getElementById('gen-btn')
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI is writing your document...'
+  btn.disabled = true
+  document.getElementById('policy-output').classList.add('hidden')
+
+  const builders = {
+    leave: buildLeavePolicy,
+    disciplinary: buildDisciplinaryCode,
+    contract: buildContract,
+    grievance: buildGrievance
+  }
+
+  try {
+    const { data: { session } } = await sb.auth.getSession()
+    const res = await fetch(
+      'https://tlnomboqhglhbyyxdgwo.supabase.co/functions/v1/generate-policy',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+        body: JSON.stringify({ company, industry, size, province, notes, policy_type: selectedPolicyType })
+      }
+    )
+    const result = await res.json()
+
+    if (result.error) {
+      console.warn('AI failed, using template:', result.error)
+      generatedPolicyText = builders[selectedPolicyType](company, industry, size, province, notes)
+      toast('Generated using template (AI unavailable).', 'warning')
+    } else {
+      generatedPolicyText = result.document
+      toast('AI document generated successfully!', 'success')
+    }
+  } catch(err) {
+    console.warn('Network error, using template:', err)
+    generatedPolicyText = builders[selectedPolicyType](company, industry, size, province, notes)
+    toast('Generated using template (offline).', 'warning')
+  }
+
+  document.getElementById('policy-content').textContent = generatedPolicyText
+  document.getElementById('policy-output').classList.remove('hidden')
+  document.getElementById('download-btn').style.display = 'inline-flex'
+  btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Document'
+  btn.disabled = false
+
+  const s3 = document.getElementById('step3')
+  const l2 = document.getElementById('line2')
+  const s2 = document.getElementById('step2')
+  if (s3) s3.className = 'step-item step-active'
+  if (s2) s2.className = 'step-item step-done'
+  if (l2) l2.className = 'step-line done'
+
+  document.getElementById('policy-output').scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+window.downloadPolicy = function() {
+  if (!generatedPolicyText) return toast('Please generate a document first.', 'error')
+
+  const company = document.getElementById('pg-company').value.trim() || 'Company'
+  const industry = document.getElementById('pg-industry').value || ''
+  const province = document.getElementById('pg-province').value || ''
+  const typeLabels = { leave: 'Leave Policy', disciplinary: 'Disciplinary Code', contract: 'Employment Contract', grievance: 'Grievance Procedure' }
+  const typeNames = { leave: 'Leave-Policy', disciplinary: 'Disciplinary-Code', contract: 'Employment-Contract', grievance: 'Grievance-Procedure' }
+  const fileName = company.replace(/[^a-zA-Z0-9]/g, '-') + '-' + typeNames[selectedPolicyType] + '.doc'
+  const today = new Date().toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' })
+
+  const lines = generatedPolicyText.split('\n')
+  let bodyHtml = ''
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) { bodyHtml += '<p style="margin:0;height:8pt;">&nbsp;</p>'; continue }
+    if (line === line.toUpperCase() && line.length < 60 && i < 5) {
+      bodyHtml += '<p style="font-size:16pt;font-weight:bold;text-align:center;color:#1a1a2e;margin:4pt 0;">' + line + '</p>'
+    } else if (/^\d+\.\s+[A-Z]/.test(line) && line.length < 80) {
+      bodyHtml += '<p style="font-size:11pt;font-weight:bold;color:#1a56db;margin:14pt 0 4pt;border-bottom:1pt solid #d1d5db;padding-bottom:3pt;">' + line + '</p>'
+    } else if (line.startsWith('---')) {
+      bodyHtml += '<hr style="border:none;border-top:1pt solid #d1d5db;margin:10pt 0;">'
+    } else {
+      bodyHtml += '<p style="font-size:10.5pt;margin:3pt 0;color:#374151;line-height:1.6;">' + line + '</p>'
+    }
+  }
+
+  const wordHtml = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">' +
+    '<head><meta charset="utf-8"><style>@page{size:A4;margin:2.5cm 2cm 2cm 2.5cm;}body{font-family:Calibri,Arial,sans-serif;font-size:10.5pt;color:#374151;}' +
+    '.doc-header{border-bottom:3pt solid #1a56db;padding-bottom:14pt;margin-bottom:20pt;}.brand{font-size:18pt;font-weight:bold;color:#1a56db;}' +
+    '.brand-sub{font-size:8pt;color:#6b7280;}.doc-meta{font-size:8pt;color:#6b7280;text-align:right;}.doc-title{font-size:14pt;font-weight:bold;margin:8pt 0 4pt;}' +
+    '.doc-footer{border-top:1pt solid #d1d5db;margin-top:30pt;padding-top:10pt;font-size:8pt;color:#9ca3af;}</style></head><body>' +
+    '<div class="doc-header"><div style="display:flex;justify-content:space-between;"><div><div class="brand">NexaHR</div><div class="brand-sub">Smart HR Management for South Africa</div></div>' +
+    '<div class="doc-meta"><strong>' + company + '</strong><br>' + industry + ' | ' + province + '<br>Generated: ' + today + '</div></div>' +
+    '<div class="doc-title">' + typeLabels[selectedPolicyType] + '</div></div>' +
+    bodyHtml +
+    '<div class="doc-footer">Confidential - ' + company + ' | Generated by NexaHR | ' + today + '</div></body></html>'
+
+  const blob = new Blob(['\ufeff' + wordHtml], { type: 'application/msword;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+  toast('Document downloaded!', 'success')
+}
+
 async function bootApp() {
   try {
     // Check localStorage cache first for instant load

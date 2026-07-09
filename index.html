@@ -1183,68 +1183,69 @@ async function initApp(user) {
   document.getElementById('main-app').classList.add('hidden')
   document.getElementById('auth-page').classList.add('hidden')
 
-  // Load or create profile
-  let profileRes = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
-  let profile = profileRes.data
+  // Load profile with metadata fallback for RLS resilience
+  let profile = null
 
-  console.log('Profile loaded:', profile?.role, 'company:', profile?.company_id)
+  // Try DB first
+  try {
+    const { data, error } = await sb
+      .from('profiles')
+      .select('*, companies(name)')
+      .eq('id', user.id)
+      .single()
+    if (!error && data) {
+      profile = data
+      console.log('Profile loaded from DB:', profile.role, 'company:', profile.company_id)
+      // Cache role and company in auth metadata as fallback
+      sb.auth.updateUser({ data: {
+        nexahr_role: profile.role,
+        nexahr_company_id: profile.company_id,
+        nexahr_full_name: profile.full_name
+      }}).catch(() => {})
+    }
+  } catch(e) { console.log('DB profile error:', e.message) }
 
+  // If DB blocked by RLS, use cached metadata
   if (!profile) {
-    // Create profile if missing
-    await sb.from('profiles').upsert({
+    const meta = user.user_metadata || {}
+    const cachedRole = meta.nexahr_role || meta.role || 'employee'
+    const cachedCompanyId = meta.nexahr_company_id || null
+    const cachedName = meta.nexahr_full_name || meta.full_name || user.email.split('@')[0]
+    console.log('Using metadata cache, role:', cachedRole)
+    profile = {
       id: user.id,
-      full_name: user.user_metadata?.full_name || user.email.split('@')[0],
-      role: 'employee',
-      department: user.user_metadata?.department || ''
-    })
-    profileRes = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
-    profile = profileRes.data
+      full_name: cachedName,
+      role: cachedRole,
+      department: meta.department || '',
+      company_id: cachedCompanyId,
+      companies: null
+    }
   }
 
-  if (!profile) {
-    // RLS blocking - try direct REST call with auth header
-    console.warn('Profile blocked by RLS - attempting direct fetch')
+  // Create DB profile if missing
+  if (profile && !profile.created_at) {
     try {
-      const { data: { session } } = await sb.auth.getSession()
-      const resp = await fetch(
-        'https://tlnomboqhglhbyyxdgwo.supabase.co/rest/v1/profiles?id=eq.' + user.id + '&select=*',
-        {
-          headers: {
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsbm9tYm9xaGdsaGJ5eXhkZ3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MzQwNjIsImV4cCI6MjA5NTQxMDA2Mn0.Eo7we1Qz00mNZ8NJmaDc0qzFwFxoY6KxNntdz-bTGJM',
-            'Authorization': 'Bearer ' + (session?.access_token || '')
-          }
-        }
-      )
-      const rows = await resp.json()
-      if (rows && rows.length > 0) {
-        profile = rows[0]
-        profile.companies = null
-        console.log('Direct fetch succeeded, role:', profile.role)
-      }
-    } catch(fetchErr) {
-      console.error('Direct fetch failed:', fetchErr)
-    }
-
-    if (!profile) {
-      profile = {
+      await sb.from('profiles').upsert({
         id: user.id,
-        full_name: user.user_metadata?.full_name || user.email.split('@')[0],
-        role: user.user_metadata?.role || 'employee',
-        department: '',
-        company_id: null,
-        companies: null
-      }
-      console.warn('Using metadata fallback, role:', profile.role)
-    }
-  }
-
-  if (profile && !profile.full_name) {
-    const fixedName = user.user_metadata?.full_name || user.email.split('@')[0]
-    await sb.from('profiles').update({ full_name: fixedName }).eq('id', user.id)
-    profile.full_name = fixedName
+        full_name: profile.full_name,
+        role: 'employee',
+        department: profile.department || ''
+      })
+    } catch(e) { console.log('Upsert skipped') }
   }
 
   cp = profile
+
+  // Ensure user has a company assigned (handles users created before company logic)
+  if (!cp.company_id) {
+    cp = await ensureCompanyAssigned(user, cp)
+    // Reload with company name joined
+    if (cp.company_id) {
+      const { data: refreshed } = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
+      if (refreshed) cp = refreshed
+    }
+  }
+
   const displayName = cp?.full_name 
     || cu?.user_metadata?.full_name 
     || user.user_metadata?.full_name 
@@ -2052,6 +2053,162 @@ window.downloadPolicy = function() {
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
   toast('Document downloaded!', 'success')
+}
+
+// -- RENDER PROFILE PAGE --
+function renderProfile() {
+  const name = cp?.full_name || cu?.email || ''
+  const avatarBig = document.getElementById('prof-avatar-big')
+  if (avatarBig) {
+    avatarBig.textContent = ini(name)
+    const colorIdx = name.charCodeAt(0) % 6
+    avatarBig.className = 'profile-avatar-big avatar-color-' + colorIdx
+  }
+  const nameEl = document.getElementById('prof-name')
+  if (nameEl) nameEl.textContent = name
+
+  const companyName = cp?.companies?.name || ''
+  const roleLabelMap = { employee: 'Employee', manager: 'Manager', admin: 'Admin', hr_admin: 'Admin' }
+  const roleEl = document.getElementById('prof-role')
+  if (roleEl) roleEl.textContent = (roleLabelMap[cp?.role] || cp?.role || 'Employee') + (companyName ? ' -- ' + companyName : '')
+
+  const nameInput = document.getElementById('prof-name-input')
+  if (nameInput) nameInput.value = name
+  const emailInput = document.getElementById('prof-email-input')
+  if (emailInput) emailInput.value = cu?.email || ''
+  const deptInput = document.getElementById('prof-dept-input')
+  if (deptInput) deptInput.value = cp?.department || ''
+  const roleInput = document.getElementById('prof-role-input')
+  if (roleInput) roleInput.value = roleLabelMap[cp?.role] || cp?.role || ''
+
+  const usedMap = {}
+  myApps().filter(function(a) { return a.status === 'approved' }).forEach(function(a) {
+    usedMap[a.leave_type] = (usedMap[a.leave_type] || 0) + (a.working_days || 0)
+  })
+  const balGrid = document.getElementById('prof-balance-grid')
+  if (balGrid) {
+    balGrid.innerHTML = Object.entries(LEAVE_BALANCES).map(function([type, total]) {
+      const used = usedMap[type] || 0
+      const rem = Math.max(0, total - used)
+      const pct = Math.round((used / total) * 100)
+      const barColor = pct > 80 ? '#ef4444' : pct > 50 ? '#f59e0b' : '#10b981'
+      return '<div class="balance-card"><div class="days">' + rem + '</div><div class="type">' + type + '</div>' +
+        '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
+        '<div class="used">' + used + ' used of ' + total + ' days</div></div>'
+    }).join('')
+  }
+}
+
+window.saveProfile = async function() {
+  const newName = document.getElementById('prof-name-input').value.trim()
+  if (!newName) return toast('Name cannot be empty.', 'error')
+  const { error } = await sb.from('profiles').update({ full_name: newName }).eq('id', cu.id)
+  if (error) return toast(error.message, 'error')
+  cp.full_name = newName
+  document.getElementById('user-name-display').textContent = newName
+  const avatarEl = document.getElementById('user-avatar')
+  if (avatarEl) avatarEl.textContent = ini(newName)
+  renderProfile()
+  toast('Profile updated!', 'success')
+}
+
+window.changePassword = async function() {
+  const nw = document.getElementById('pw-new').value
+  const cf = document.getElementById('pw-confirm').value
+  if (!nw || !cf) return toast('Please fill both password fields.', 'error')
+  if (nw !== cf) return toast('Passwords do not match.', 'error')
+  if (nw.length < 6) return toast('Password must be at least 6 characters.', 'error')
+  const { error } = await sb.auth.updateUser({ password: nw })
+  if (error) return toast(error.message, 'error')
+  document.getElementById('pw-new').value = ''
+  document.getElementById('pw-confirm').value = ''
+  toast('Password updated!', 'success')
+}
+
+// -- ENSURE COMPANY ASSIGNMENT ON LOGIN --
+async function ensureCompanyAssigned(user, profile) {
+  if (profile.company_id) return profile // already has a company
+
+  const companyName = user.user_metadata?.company_name || 'Default Company'
+
+  try {
+    // Try to find existing company (case-insensitive)
+    let { data: existingCompany } = await sb
+      .from('companies')
+      .select('id')
+      .ilike('name', companyName)
+      .limit(1)
+      .single()
+
+    let companyId = existingCompany?.id
+
+    if (!companyId) {
+      // Create new company
+      const { data: newCompany, error: createErr } = await sb
+        .from('companies')
+        .insert({ name: companyName })
+        .select('id')
+        .single()
+      if (createErr) {
+        console.error('Could not create company:', createErr)
+        return profile
+      }
+      companyId = newCompany.id
+    }
+
+    // Check if this is the first user for this company - if so make them admin
+    const { count } = await sb
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('company_id', companyId)
+
+    const newRole = (count === 0) ? 'admin' : profile.role
+
+    const { error: updateErr } = await sb
+      .from('profiles')
+      .update({ company_id: companyId, role: newRole })
+      .eq('id', user.id)
+
+    if (!updateErr) {
+      profile.company_id = companyId
+      profile.role = newRole
+      console.log('Company assigned:', companyName, 'role:', newRole)
+    }
+  } catch(err) {
+    console.error('ensureCompanyAssigned error:', err)
+  }
+
+  return profile
+}
+
+// -- CANCEL APPLICATION --
+window.askCancel = function(id) {
+  cancelTargetId = id
+  document.getElementById('cancel-modal').classList.remove('hidden')
+}
+
+window.confirmCancel = async function() {
+  const { error } = await sb.from('leave_applications').update({ status: 'cancelled' }).eq('id', cancelTargetId)
+  if (error) return toast(error.message, 'error')
+  toast('Application cancelled.', 'warning')
+  closeModal('cancel-modal')
+  await loadAllApps()
+  renderHist()
+  renderDash()
+}
+
+// -- REJECT APPLICATION --
+window.askReject = function(id) {
+  rejectTargetId = id
+  document.getElementById('reject-reason').value = ''
+  document.getElementById('reject-modal').classList.remove('hidden')
+}
+
+window.confirmReject = async function() {
+  const reason = document.getElementById('reject-reason').value.trim()
+  if (!reason) return toast('Please provide a rejection reason.', 'error')
+  await setStatus(rejectTargetId, 'rejected', reason)
+  closeModal('reject-modal')
 }
 
 async function bootApp() {

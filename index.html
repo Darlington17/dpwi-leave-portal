@@ -1183,65 +1183,55 @@ async function initApp(user) {
   document.getElementById('main-app').classList.add('hidden')
   document.getElementById('auth-page').classList.add('hidden')
 
-  // Load or create profile
-  let profileRes = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
-  let profile = profileRes.data
+  // Load profile with metadata fallback for RLS resilience
+  let profile = null
 
-  console.log('Profile loaded:', profile?.role, 'company:', profile?.company_id)
+  // Try DB first
+  try {
+    const { data, error } = await sb
+      .from('profiles')
+      .select('*, companies(name)')
+      .eq('id', user.id)
+      .single()
+    if (!error && data) {
+      profile = data
+      console.log('Profile loaded from DB:', profile.role, 'company:', profile.company_id)
+      // Cache role and company in auth metadata as fallback
+      sb.auth.updateUser({ data: {
+        nexahr_role: profile.role,
+        nexahr_company_id: profile.company_id,
+        nexahr_full_name: profile.full_name
+      }}).catch(() => {})
+    }
+  } catch(e) { console.log('DB profile error:', e.message) }
 
+  // If DB blocked by RLS, use cached metadata
   if (!profile) {
-    // Create profile if missing
-    await sb.from('profiles').upsert({
+    const meta = user.user_metadata || {}
+    const cachedRole = meta.nexahr_role || meta.role || 'employee'
+    const cachedCompanyId = meta.nexahr_company_id || null
+    const cachedName = meta.nexahr_full_name || meta.full_name || user.email.split('@')[0]
+    console.log('Using metadata cache, role:', cachedRole)
+    profile = {
       id: user.id,
-      full_name: user.user_metadata?.full_name || user.email.split('@')[0],
-      role: 'employee',
-      department: user.user_metadata?.department || ''
-    })
-    profileRes = await sb.from('profiles').select('*, companies(name)').eq('id', user.id).single()
-    profile = profileRes.data
+      full_name: cachedName,
+      role: cachedRole,
+      department: meta.department || '',
+      company_id: cachedCompanyId,
+      companies: null
+    }
   }
 
-  if (!profile) {
-    // RLS blocking - try direct REST call with auth header
-    console.warn('Profile blocked by RLS - attempting direct fetch')
+  // Create DB profile if missing
+  if (profile && !profile.created_at) {
     try {
-      const { data: { session } } = await sb.auth.getSession()
-      const resp = await fetch(
-        'https://tlnomboqhglhbyyxdgwo.supabase.co/rest/v1/profiles?id=eq.' + user.id + '&select=*',
-        {
-          headers: {
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsbm9tYm9xaGdsaGJ5eXhkZ3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MzQwNjIsImV4cCI6MjA5NTQxMDA2Mn0.Eo7we1Qz00mNZ8NJmaDc0qzFwFxoY6KxNntdz-bTGJM',
-            'Authorization': 'Bearer ' + (session?.access_token || '')
-          }
-        }
-      )
-      const rows = await resp.json()
-      if (rows && rows.length > 0) {
-        profile = rows[0]
-        profile.companies = null
-        console.log('Direct fetch succeeded, role:', profile.role)
-      }
-    } catch(fetchErr) {
-      console.error('Direct fetch failed:', fetchErr)
-    }
-
-    if (!profile) {
-      profile = {
+      await sb.from('profiles').upsert({
         id: user.id,
-        full_name: user.user_metadata?.full_name || user.email.split('@')[0],
-        role: user.user_metadata?.role || 'employee',
-        department: '',
-        company_id: null,
-        companies: null
-      }
-      console.warn('Using metadata fallback, role:', profile.role)
-    }
-  }
-
-  if (profile && !profile.full_name) {
-    const fixedName = user.user_metadata?.full_name || user.email.split('@')[0]
-    await sb.from('profiles').update({ full_name: fixedName }).eq('id', user.id)
-    profile.full_name = fixedName
+        full_name: profile.full_name,
+        role: 'employee',
+        department: profile.department || ''
+      })
+    } catch(e) { console.log('Upsert skipped') }
   }
 
   cp = profile
